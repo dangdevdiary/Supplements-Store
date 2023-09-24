@@ -1,6 +1,7 @@
 import http from 'src/utils/http';
 import { ResGetAllUser, User, UserInfoWhenUpdate } from 'src/types/user.type';
 import { ProductListConfig } from 'src/types/product.type';
+import { TForgotPassword } from 'src/pages/forgotpassword/ForgotPassword';
 const userApi = {
   getUserByid(id: number) {
     return http.get<User>(`/user/${id}`);
@@ -32,7 +33,7 @@ const userApi = {
   changePassword(old_password: string, new_password: string) {
     return http.patch<{
       message: string;
-    }>('/user/change_password', {
+    }>('user/change_password', {
       old_password,
       new_password,
     });
@@ -43,7 +44,20 @@ const userApi = {
     });
   },
   deleteUser(userId: number) {
-    return http.delete(`/user/${userId}`);
+    return http.delete(`user/${userId}`);
+  },
+  forgotPassword(email: string) {
+    return http.post<{
+      message: string;
+      data: {
+        tokenId: string;
+      };
+    }>('user/forgot-password', {
+      email,
+    });
+  },
+  resetPassword(data: Omit<TForgotPassword, 'confirmNewPassword' | 'otp'> & { otp: string }) {
+    return http.post<{ message: string }>('user/reset-password', data);
   },
 };
 export default userApi;

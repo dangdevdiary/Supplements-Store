@@ -1,47 +1,50 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Product } from "./product.entity";
 import { User } from "./user.entity";
 
 export enum EnumTypeImage {
-    avatar = "avatar", // avatar user
-    thumbnail = "thumbnail", // thumbnail
-    options = "options", // options of product,
-    desc = "desc"
+  avatar = "avatar", // avatar user
+  thumbnail = "thumbnail", // thumbnail
+  options = "options", // options of product,
+  desc = "desc",
 }
 
 @Entity("images")
 export class Image {
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-    @PrimaryGeneratedColumn("uuid")
-    id!: string;
+  @Column({
+    type: "enum",
+    enum: EnumTypeImage,
+  })
+  type!: EnumTypeImage;
 
-    @Column({
-        type: "enum",
-        enum: EnumTypeImage,
-    })
-    type!: EnumTypeImage;
+  @Column()
+  image_url!: string;
 
-    @Column()
-    image_url!: string;
+  @OneToOne(() => User, (user) => user.avatar, {
+    nullable: true,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({
+    name: "user_id",
+  })
+  user!: User;
 
-
-    @OneToOne(() => User, { nullable:true })
-    @JoinColumn({
-        name: "user_id"
-    })
-    user!: User;
-
-    @ManyToOne(
-        () => Product,
-        product => product.images,
-        {
-            nullable: true,
-            onDelete: "CASCADE"
-        }
-    )
-    @JoinColumn({
-        name: "product_id"
-    })
-    product!: Product;
-
+  @ManyToOne(() => Product, (product) => product.images, {
+    nullable: true,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({
+    name: "product_id",
+  })
+  product!: Product;
 }

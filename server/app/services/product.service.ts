@@ -69,8 +69,8 @@ export const getAll = async (
       },
     },
     order: {
-      id: order === 'newest' ? 'DESC' : 'ASC'
-    }
+      id: order === "newest" ? "DESC" : "ASC",
+    },
   });
   const last_page = Math.ceil(count / limit);
   const prev_page = page - 1 < 1 ? null : page - 1;
@@ -137,16 +137,18 @@ export const create = async (
         });
     const newPrice = await priceRepo.save(tempPrice);
     const priceHistoryRepo = AppDataSource.getRepository(PriceHistory);
-    await priceHistoryRepo.save(priceHistoryRepo.create({
-      old_price: price,
-      new_price: price,
-      price: newPrice
-    }));
+    await priceHistoryRepo.save(
+      priceHistoryRepo.create({
+        old_price: price,
+        new_price: price,
+        price: newPrice,
+      })
+    );
 
     // init warehouse stock
     const warehouseRepo = AppDataSource.getRepository(Warehouse);
     const newWarehouse = await warehouseRepo.save(
-      warehouseRepo.create({ quantity: 0 })
+      warehouseRepo.create({ quantity: 1 })
     );
 
     const imageRepo = AppDataSource.getRepository(Image);
@@ -249,22 +251,29 @@ export const getOneById = async (id: number) => {
     : BadRequestError("product not found!");
 };
 
-export const update = async (id: number, product: ProductInterface, brand_id = -1) => {
+export const update = async (
+  id: number,
+  product: ProductInterface,
+  brand_id = -1
+) => {
   const _product = await productRepository.findOne({
     where: {
-      id
+      id,
     },
     relations: {
-      brand: true
-    }
+      brand: true,
+    },
   });
   if (!_product) return BadRequestError("product not found!");
   const brandRepo = AppDataSource.getRepository(Brand);
-  const brand = await brandRepo.findOneBy({ id: brand_id !== -1 ? brand_id : _product.brand.id });
-  if(!brand) return BadRequestError("error when retrieve brand");
+  const brand = await brandRepo.findOneBy({
+    id: brand_id !== -1 ? brand_id : _product.brand.id,
+  });
+  if (!brand) return BadRequestError("error when retrieve brand");
   // console.log(brand);
-  
-  return (await productRepository.update({ id }, { ...product, brand })).affected
+
+  return (await productRepository.update({ id }, { ...product, brand }))
+    .affected
     ? success()
     : failed();
 };

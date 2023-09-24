@@ -7,6 +7,7 @@ import { AppDataSource } from "./app/database";
 import { Routes } from "./app/routes";
 import passport from "passport";
 import bodyParser from "body-parser";
+// import { craw } from "./app/utils/helpers";
 
 AppDataSource.initialize()
   .then(() => {
@@ -30,4 +31,9 @@ AppDataSource.initialize()
       console.log(`Server is listening on port ${PORT}.`);
     });
   })
+  // .then(() => {
+  //   craw().catch(() => {
+  //     console.log("errr");
+  //   });
+  // })
   .catch((error) => console.log("error when connect to database", error));

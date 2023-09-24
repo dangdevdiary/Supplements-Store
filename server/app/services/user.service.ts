@@ -1,13 +1,15 @@
 import { DeleteResult } from "typeorm";
 import { AppDataSource } from "../database";
 import { User } from "../entities/user.entity";
+import { EnumTypeImage, Image } from "../entities/image.entity";
 import { BadRequestError, ErrorInterface } from "../utils/error";
 import bcryptjs from "bcryptjs";
 import { Address } from "../entities/address.entity";
-import { failed, success } from "../utils/response";
+import { Ok, failed, success } from "../utils/response";
 import sendMail from "../utils/mailer";
 import jwt from "jsonwebtoken";
 import { Token } from "../entities/token.entity";
+import fs from "fs";
 enum UserRole {
   ADMIN = "admin",
   MEMBER = "member",
@@ -150,11 +152,23 @@ export const verify = async (
 };
 
 export const forgotPwd = async (email: string) => {
-  const user = await userRepository.findOneBy({
-    email,
+  const user = await userRepository.findOne({
+    where: {
+      email,
+    },
+    relations: {
+      token: true,
+    },
   });
   if (!user) {
     return BadRequestError("User not found");
+  }
+  const exitsToken = user.token.find((t) => t.tokenName === "resetPassword");
+  if (exitsToken) {
+    console.log("token exist");
+    await tokenRepository.delete({
+      tokenId: exitsToken.tokenId,
+    });
   }
   const srk = (process.env.JWT_SECRET_KEY as string) + user.password;
   const otp = Math.floor(99999 + Math.random() * 900000);
@@ -170,8 +184,8 @@ export const forgotPwd = async (email: string) => {
     tokenRepository.create({
       tokenName: "resetPassword",
       tokenValue: tokenReset,
+      expire: new Date(new Date().getTime() + 10 * 60 * 1000).toString(),
       user,
-      expire: "10m",
     })
   );
   await sendMail(
@@ -209,24 +223,32 @@ export const forgotPwd = async (email: string) => {
     </html>`
   );
   return updateTokenRS
-    ? updateTokenRS
+    ? Ok<{
+        tokenId: number;
+      }>({
+        tokenId: updateTokenRS.tokenId,
+      })
     : BadRequestError("Email can not send to you");
 };
 
 export const resetPwd = async (
   email: string,
   otp: string,
-  newPassword: string
+  newPassword: string,
+  tokenId: number
 ) => {
-  const user = await userRepository.findOneBy({
-    email,
+  const user = await userRepository.findOne({
+    where: {
+      email,
+    },
   });
   if (!user) {
     return BadRequestError("User not found");
   }
+  if (!tokenId) return BadRequestError("Token not valid!");
   const resetToken = await tokenRepository.findOne({
     where: {
-      tokenName: "resetPassword",
+      tokenId,
     },
   });
   if (!resetToken) {
@@ -239,9 +261,14 @@ export const resetPwd = async (
 
     if (Number(payload.otp) === Number(otp)) {
       user.password = bcryptjs.hashSync(newPassword, 8);
-      return (await userRepository.update({ email }, user)).affected
-        ? success()
-        : failed();
+      if ((await userRepository.update({ email }, user)).affected) {
+        await tokenRepository.delete({
+          tokenId,
+        });
+        return success();
+      } else {
+        return failed();
+      }
     } else {
       return BadRequestError("OTP is not valid!", 400);
     }
@@ -249,6 +276,41 @@ export const resetPwd = async (
   return BadRequestError("can't update password", 500);
 };
 
+export const addAvatar = async (uid: number, pathImg: string) => {
+  const imageRepo = AppDataSource.getRepository(Image);
+  const user = await userRepository.findOne({
+    where: {
+      id: uid,
+    },
+    relations: {
+      avatar: true,
+    },
+  });
+  if (!user) return BadRequestError("User not found");
+
+  if (user?.avatar?.id) {
+    try {
+      fs.unlinkSync("./public/" + user.avatar.image_url);
+      const rsUpdate = await imageRepo.update(
+        { image_url: user.avatar.image_url },
+        { image_url: pathImg }
+      );
+      return rsUpdate ? rsUpdate : BadRequestError("Fail");
+    } catch (error) {
+      return error;
+    }
+  }
+
+  if (!pathImg.length) return BadRequestError("image empty");
+  const rs = await imageRepo.save(
+    imageRepo.create({
+      type: EnumTypeImage.avatar,
+      image_url: pathImg,
+      user,
+    })
+  );
+  return rs ? rs : BadRequestError("Fail");
+};
 export const getOne = async (
   id: number
 ): Promise<ErrorInterface | UserReturnInterface> => {
@@ -258,6 +320,7 @@ export const getOne = async (
     },
     relations: {
       address: true,
+      avatar: true,
     },
   });
   return result ? result : BadRequestError("user not found!");

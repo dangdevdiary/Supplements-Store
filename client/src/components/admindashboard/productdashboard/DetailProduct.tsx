@@ -6,7 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import productsApi from 'src/apis/product.api';
 import { dateToString } from 'src/utils/convertDate';
-import { LineChart } from '../maindashboard/chart/LineChart';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineFileSearch } from 'react-icons/ai';
 import { baseURL } from 'src/constants/constants';
 import { Dispatch, SetStateAction, useState } from 'react';

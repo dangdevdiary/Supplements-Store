@@ -11,18 +11,17 @@ import { feedbackRoutes } from "./feedback.route";
 import { AnalysisRoutes } from "./analysis.route";
 import { CouponRoutes } from "./coupon.route";
 
-
 export const Routes = [
-    UserRoutes,
-    OrderRoutes,
-    ProductRoutes,
-    AuthRoutes,
-    ProductOptionRoutes,
-    specificationRoutes,
-    brandRoutes,
-    InventoryRoutes,
-    NotifyRoutes,
-    feedbackRoutes,
-    AnalysisRoutes,
-    CouponRoutes
+  UserRoutes,
+  OrderRoutes,
+  ProductRoutes,
+  AuthRoutes,
+  ProductOptionRoutes,
+  specificationRoutes,
+  brandRoutes,
+  InventoryRoutes,
+  NotifyRoutes,
+  feedbackRoutes,
+  AnalysisRoutes,
+  CouponRoutes,
 ];

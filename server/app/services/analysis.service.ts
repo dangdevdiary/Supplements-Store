@@ -25,7 +25,6 @@ export const productInWarehouse = async (
   search: string | undefined = undefined
 ) => {
   const offset = (page - 1) * limit;
-
   const [data, count] = await productOptionRepo.findAndCount({
     where: {
       warehouse: {
@@ -52,7 +51,6 @@ export const productInWarehouse = async (
       },
     },
   });
-
   const last_page = Math.ceil(count / limit);
   const prev_page = page - 1 < 1 ? null : page - 1;
   const next_page = page + 1 > last_page ? null : page + 1;

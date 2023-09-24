@@ -10,5 +10,6 @@ const path = {
   brand: '/brand/:id',
   checkout: '/checkout',
   myOrders: '/myOrders',
+  forgotPassword: '/forgot-password',
 };
 export default path;

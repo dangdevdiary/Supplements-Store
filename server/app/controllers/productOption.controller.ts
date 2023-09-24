@@ -12,7 +12,6 @@ export const create = async (
   const { color, ram, rom, price } = req.body;
   const { product_id } = req.params;
   const file = req.file;
-  console.log(file);
 
   if (!file)
     return next(err(BadRequestError("image for product is required!"), res));

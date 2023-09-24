@@ -40,6 +40,22 @@ export const verifyEmail = async (
   const rs = await userServices.verify(email, token);
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };
+
+export const addAvatar = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const uid = Number(req.params.uid);
+  const file = req.file as Express.Multer.File;
+
+  const rs = await userServices.addAvatar(
+    Number(uid),
+    file.path.replace("public\\", "")
+  );
+  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+};
+
 export const getOne = async (
   req: Request,
   res: Response,
@@ -163,10 +179,15 @@ export const resetPassword = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { otp, email, newPassword } = req.body as {
+  const { otp, email, newPassword, tokenId } = req.body as {
     [key: string]: string;
   };
 
-  const rs = await userServices.resetPwd(email, otp, newPassword);
+  const rs = await userServices.resetPwd(
+    email,
+    otp,
+    newPassword,
+    Number(tokenId)
+  );
   return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };

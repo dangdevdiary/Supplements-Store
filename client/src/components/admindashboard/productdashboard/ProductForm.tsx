@@ -13,7 +13,10 @@ export default function ProductForm() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const brand = useQuery(['get_all_brands'], () => brandApi.getAllBrand(''));
+  const brand = useQuery(['get_all_brands'], () => brandApi.getAllBrand(''), {
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
   const [name, setName] = useState('');
   const [brand_id, setBrandId] = useState(-1);
   const [image, setImage] = useState<File>();

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import passport from "passport";
+// import { Response } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { AppDataSource } from "../database";
 import { User } from "../entities/user.entity";

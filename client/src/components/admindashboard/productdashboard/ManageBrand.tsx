@@ -115,7 +115,10 @@ export default function ManageBrand() {
   const currentModal = useSelector(selectCurrentModal);
   const dispatch = useDispatch();
 
-  const { data, isLoading, refetch } = useQuery(['get_all_brands', params], () => brandApi.getAllBrand(params.search));
+  const { data, isLoading, refetch } = useQuery(['get_all_brands', params], () => brandApi.getAllBrand(params.search), {
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <div className='mt-4'>

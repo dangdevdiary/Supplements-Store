@@ -3,7 +3,8 @@ import * as user from "../controllers/user.controller";
 import express, { Express } from "express";
 import * as validation from "../middlewares/validation";
 import * as auth from "../middlewares/auth";
-
+import upload from "../middlewares/upload";
+import * as authMiddleware from "../middlewares/auth";
 export const UserRoutes = (app: Express) => {
   const router = express.Router();
 
@@ -12,11 +13,20 @@ export const UserRoutes = (app: Express) => {
     user.getAll
   );
   router.post(
+    "/avatar/add/:uid",
+    [
+      authMiddleware.verifyToken(),
+      upload.single("image"),
+      validation.validateImageExtension,
+    ],
+    user.addAvatar
+  );
+  router.post(
     "/",
     [validation.validateEmail, validation.validatePhoneNumber],
     user.createNew
   );
-  router.get("/:id(\\d+)", user.getOne);
+  router.get("/:id(\\d+)", [authMiddleware.verifyToken()], user.getOne);
   router.put(
     "/:id",
     [

@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   OneToMany,
+  OneToOne,
 } from "typeorm";
 import { Order } from "./order.entity";
 import { Address } from "./address.entity";
@@ -11,6 +12,7 @@ import { Notification } from "./notification.entity";
 import { Feedback } from "./feedback.entity";
 import { WorkQueue } from "./workQueue.entity";
 import { Token } from "./token.entity";
+import { Image } from "./image.entity";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -110,4 +112,6 @@ export class User {
 
   @OneToMany(() => Token, (token) => token.user)
   token!: Token[];
+  @OneToOne(() => Image, (img) => img.user, { onDelete: "CASCADE" })
+  avatar!: Image;
 }

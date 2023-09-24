@@ -26,6 +26,7 @@ import MyOrder from './pages/myorder';
 import Discount from './components/discount';
 import TopProducts from './components/topsale';
 import { useEffect } from 'react';
+import ForgotPassword from './pages/forgotpassword';
 function App() {
   useEffect(() => {
     localStorage.theme = 'light';
@@ -46,6 +47,14 @@ function App() {
             </MainLayout>
           }
         />
+        <Route
+          path={path.forgotPassword}
+          element={
+            <MainLayout>
+              <ForgotPassword></ForgotPassword>
+            </MainLayout>
+          }
+        />
         <Route path='' element={<ProtectedRoute />}>
           <Route
             path={path.checkout}
@@ -55,6 +64,7 @@ function App() {
               </CheckoutLayout>
             }
           />
+
           <Route
             path={path.myOrders}
             element={

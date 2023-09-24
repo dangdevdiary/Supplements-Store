@@ -3,18 +3,17 @@ import { Product } from "./product.entity";
 
 @Entity("brand")
 export class Brand {
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column()
-    name!: string;
+  @Column()
+  name!: string;
 
-    @Column()
-    description!: string;
+  @Column({
+    type: "longtext",
+  })
+  description!: string;
 
-    @OneToMany(
-        () => Product,
-        product => product.brand
-    )
-    products!: Product[];
+  @OneToMany(() => Product, (product) => product.brand)
+  products!: Product[];
 }

@@ -69,8 +69,8 @@ function Login() {
               <span className='group/fb mx-1 rounded-full border-2 border-blue-500 p-3 duration-300 hover:bg-form hover:text-white'>
                 <FaFacebookF className='text-xl text-blue-500 group-hover/fb:text-white' />
               </span>
-              <span className='mx-1 rounded-full border-2 bg-[#0a66c2] p-3 duration-300 hover:bg-form hover:text-white'>
-                <FaLinkedinIn className='text-xl text-white' />
+              <span className='group/lk mx-1 rounded-full border-2 border-blue-500 p-3 duration-300 hover:bg-form hover:text-white'>
+                <FaLinkedinIn className='text-xl text-blue-500 group-hover/lk:text-white' />
               </span>
               <span className='group/gg mx-1 rounded-full border-2 border-red-500 p-3 duration-300 hover:bg-red-500 hover:text-white'>
                 <AiOutlineGoogle className='text-xl text-red-500 group-hover/gg:text-white' />
@@ -107,7 +107,7 @@ function Login() {
               {/* password */}
               <div
                 className={classNames(
-                  'relative mb-6 flex w-60 flex-row-reverse items-center rounded-md border-2 border-orange-400 p-2 text-gray-500',
+                  'relative mb-2 flex w-60 flex-row-reverse items-center rounded-md border-2 border-orange-400 p-2 text-gray-500',
                   {
                     'border-red-500': errors.password?.message,
                   }
@@ -149,9 +149,9 @@ function Login() {
               </div>
 
               <div className='mb-4 w-60 text-right'>
-                <a href='a' className='inline-block text-gray-500 hover:text-form'>
+                <Link to='/forgot-password' className='inline-block text-gray-500 hover:text-form'>
                   {t('login.forgot password')}
-                </a>
+                </Link>
               </div>
               <div>
                 <button

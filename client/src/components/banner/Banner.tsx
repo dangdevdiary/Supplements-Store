@@ -7,7 +7,6 @@ import banner2 from 'src/assets/img/banner-2.webp';
 import banner3 from 'src/assets/img/banner-3.webp';
 
 const images = [banner1, banner2, banner3];
-
 const variants = {
   initial: (direction: number) => {
     return {
