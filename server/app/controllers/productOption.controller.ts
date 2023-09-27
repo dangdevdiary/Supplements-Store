@@ -9,7 +9,7 @@ export const create = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { color, ram, rom, price } = req.body;
+  const { flavor, weigth, price } = req.body;
   const { product_id } = req.params;
   const file = req.file;
 
@@ -19,9 +19,8 @@ export const create = async (
   const rs = await productOptionServices.create(
     Number(product_id),
     {
-      color,
-      ram,
-      rom,
+      flavor,
+      weigth,
       price,
     },
     path.replace(`public\\`, ``)
@@ -43,13 +42,12 @@ export const updateOne = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { color, ram, rom, price } = req.body;
-  if (!color && !ram && !rom && !price)
+  const { flavor, weigth, price } = req.body;
+  if (!flavor && !weigth && !price)
     return next(err(BadRequestError("data empty"), res));
   const rs = await productOptionServices.updateOne(Number(req.params.id), {
-    color,
-    ram,
-    rom,
+    flavor,
+    weigth,
     price,
   });
   return isError(rs) ? next(err(rs, res)) : res.json(rs);

@@ -2,9 +2,8 @@
 import * as user from "../controllers/user.controller";
 import express, { Express } from "express";
 import * as validation from "../middlewares/validation";
-import * as auth from "../middlewares/auth";
-import upload from "../middlewares/upload";
 import * as authMiddleware from "../middlewares/auth";
+import upload from "../middlewares/upload";
 export const UserRoutes = (app: Express) => {
   const router = express.Router();
 
@@ -32,35 +31,45 @@ export const UserRoutes = (app: Express) => {
     [
       validation.validateEmail,
       validation.validatePhoneNumber,
-      auth.verifyToken(),
+      authMiddleware.verifyToken(),
     ],
     user.updateOne
   );
-  router.post("/:id/add_address", [auth.verifyToken()], user.addAddress);
+  router.post(
+    "/:id/add_address",
+    [authMiddleware.verifyToken()],
+    user.addAddress
+  );
   router.patch(
     "/:id/set_default_address",
-    [auth.verifyToken()],
+    [authMiddleware.verifyToken()],
     user.setDefaultAddress
   );
-  router.patch("/change_password", auth.verifyToken(), user.changePassword);
+  router.patch(
+    "/change_password",
+    authMiddleware.verifyToken(),
+    user.changePassword
+  );
   router.put(
     "/:id_user/update_address/:id_address",
-    auth.verifyToken(),
+    authMiddleware.verifyToken(),
     user.updateAddress
   );
   router.delete(
     "/:id",
-    [auth.verifyToken(), auth.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
     user.deleteOne
   );
   router.delete(
     "/:id_user/delete_address/:id_address",
-    auth.verifyToken(),
+    authMiddleware.verifyToken(),
     user.deleteAddress
   );
   router.get("/verify", user.verifyEmail);
 
   router.route("/forgot-password").post(user.forgotPassword);
   router.route("/reset-password").post(user.resetPassword);
+
+  router.post("/refresh-token", user.sendRefreshToken);
   app.use("/api/user", router);
 };

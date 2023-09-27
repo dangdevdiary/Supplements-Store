@@ -19,15 +19,15 @@ interface data_feedback {
 
 export const createFeedback = async (
   product_id: number,
-  user_id: number,
+  userId: number,
   rate: number,
   comment: string | null = null
 ) => {
   const product = await productRepo.findOneBy({ id: product_id });
-  const user = await userRepo.findOneBy({ id: user_id });
+  const user = await userRepo.findOneBy({ id: userId });
   if (!product) return BadRequestError("product not found");
   if (!user) return BadRequestError("user not found");
-  const can_rate = await canRate(product_id, user_id);
+  const can_rate = await canRate(product_id, userId);
   if (!can_rate.can_rate || can_rate.is_done)
     return BadRequestError("you cannot rate this product");
   await workQueueServices.markAsDone(product, user, EnumWorkQueueType.RATE);
@@ -45,17 +45,17 @@ export const createFeedback = async (
 
 export const updateFeedback = async (
   product_id: number,
-  user_id: number,
+  userId: number,
   data: data_feedback
 ) => {
-  const can_rate = await canRate(product_id, user_id);
+  const can_rate = await canRate(product_id, userId);
   if (can_rate.can_rate && can_rate.is_done) {
     const feedback = await feedbackRepo.findOneBy({
       product: {
         id: product_id,
       },
       user: {
-        id: user_id,
+        id: userId,
       },
     });
     if (!feedback) return BadRequestError("feedback not found");

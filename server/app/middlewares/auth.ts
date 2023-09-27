@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import passport from "passport";
-// import { Response } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { AppDataSource } from "../database";
 import { User } from "../entities/user.entity";
-
+enum jwtError {
+  expired = "Token has expried!",
+  invalid = "Token is not valid!",
+}
 passport.use(
   "authz",
   new Strategy(
     {
-      secretOrKey: process.env.JWT_SECRET_KEY,
+      secretOrKey: process.env.JWT_ACCESS_KEY,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
     (payload, done) => {
-      const { user_id, role } = payload;
-      if (!user_id || !role) {
+      const { userId, role } = payload;
+      if (!userId || !role) {
         return done("token is not valid!");
       }
       if (role === "admin") return done(null, payload);
@@ -26,26 +28,40 @@ passport.use(
 passport.use(
   new Strategy(
     {
-      secretOrKey: process.env.JWT_SECRET_KEY,
+      secretOrKey: process.env.JWT_ACCESS_KEY,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
-    async (payload, done) => {
-      const { user_id, firstName, lastName, role } = payload;
+    async (
+      payload: {
+        userId: number;
+        firstName: string;
+        lastName: string;
+        role: string;
+      },
+      done
+    ) => {
+      const { userId, firstName, lastName, role } = payload;
       const userRepo = AppDataSource.getRepository(User);
-      const user = await userRepo.findOneBy({ id: user_id });
+      const user = await userRepo.findOneBy({ id: userId });
       if (
-        !user_id ||
+        !userId ||
         !firstName ||
         !lastName ||
         !role ||
         !user ||
-        user.id != user_id ||
+        user.id != userId ||
         user.role != role
       ) {
-        return done("token is not valid!", false);
+        return done(
+          {
+            status: 401,
+            message: jwtError.invalid,
+          },
+          false
+        );
       }
       return done(null, {
-        user_id,
+        userId,
         firstName,
         lastName,
         role,
@@ -66,7 +82,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface User {
-      user_id: number;
+      userId: number;
       firstName: string;
       lastName: string;
       role: string;

@@ -49,7 +49,7 @@ export const instanceOfErrorInfo = (object: any): object is error_info => {
 };
 
 export const createOrder = async (
-  user_id: number,
+  userId: number,
   products: data_order[],
   address: string | null
 ) => {
@@ -59,10 +59,10 @@ export const createOrder = async (
   const orderItemRepo = AppDataSource.getRepository(OrderItem);
   const paymentRepo = AppDataSource.getRepository(Payment);
   const timelineRepo = AppDataSource.getRepository(Timeline);
-  if (!user_id || !products) return BadRequestError("missing information");
+  if (!userId || !products) return BadRequestError("missing information");
   const user = await userRepo.findOne({
     where: {
-      id: user_id,
+      id: userId,
     },
     relations: {
       address: true,
@@ -193,9 +193,8 @@ export const getOneOrder = async (order_id: number) => {
       return {
         product_name: e.product_option.product.name,
         product_option_id: e.product_option.id,
-        ram: e.product_option.ram,
-        rom: e.product_option.rom,
-        color: e.product_option.color,
+        flavor: e.product_option.flavor,
+        weigth: e.product_option.weigth,
         price: e.product_option.price,
         quantity: e.quantity,
         image: e.product_option.image.image_url,
@@ -231,7 +230,7 @@ export const getAllOrder = async (
   status = -1,
   method = -1,
   paid = -1,
-  search = ''
+  search = ""
 ) => {
   const orderRepo = AppDataSource.getRepository(Order);
   const offset = (page - 1) * limit;
@@ -288,9 +287,8 @@ export const getAllOrder = async (
               return {
                 product_name: el.product_option.product.name,
                 product_option_id: el.product_option.id,
-                ram: el.product_option.ram,
-                rom: el.product_option.rom,
-                color: el.product_option.color,
+                flavor: el.product_option.flavor,
+                weigth: el.product_option.weigth,
                 price: el.product_option.price,
                 quantity: el.quantity,
                 prices: el.price,
@@ -308,17 +306,17 @@ export const getAllOrder = async (
 };
 
 export const getAllOrderByUser = async (
-  user_id: number,
+  userId: number,
   limit: number,
   page: number
 ) => {
-  if (!user_id) return BadRequestError("user id empty");
+  if (!userId) return BadRequestError("user id empty");
   const orderRepo = AppDataSource.getRepository(Order);
   const offset = (page - 1) * limit;
   const [rs, count] = await orderRepo.findAndCount({
     where: {
       user: {
-        id: user_id,
+        id: userId,
       },
     },
     relations: {
@@ -361,9 +359,8 @@ export const getAllOrderByUser = async (
               return {
                 product_name: el.product_option.product.name,
                 product_option_id: el.product_option.id,
-                ram: el.product_option.ram,
-                rom: el.product_option.rom,
-                color: el.product_option.color,
+                flavor: el.product_option.flavor,
+                weigth: el.product_option.weigth,
                 price: el.product_option.price,
                 quantity: el.quantity,
                 prices: el.price,

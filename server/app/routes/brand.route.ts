@@ -3,12 +3,24 @@ import * as authMiddleware from "../middlewares/auth";
 import express, { Express } from "express";
 
 export const brandRoutes = (app: Express) => {
-    const router = express.Router();
+  const router = express.Router();
 
-    router.get("/", brand.getAll);
-    router.post("/", [authMiddleware.verifyToken(), authMiddleware.require_admin()], brand.create);
-    router.delete("/:id", [authMiddleware.verifyToken(), authMiddleware.require_admin()], brand.deleteOne);
-    router.put("/:id", [authMiddleware.verifyToken(), authMiddleware.require_admin()], brand.updateOne);
+  router.get("/", brand.getAll);
+  router.post(
+    "/",
+    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    brand.create
+  );
+  router.delete(
+    "/:id",
+    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    brand.deleteOne
+  );
+  router.put(
+    "/:id",
+    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    brand.updateOne
+  );
 
-    app.use("/api/brand", router);
-}
+  app.use("/api/brand", router);
+};

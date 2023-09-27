@@ -69,9 +69,8 @@ export const productInWarehouse = async (
             quantity: e.warehouse.quantity,
             images: e.image?.image_url,
             name: e.product.name,
-            ram: e.ram,
-            rom: e.rom,
-            color: e.color,
+            flavor: e.flavor,
+            weigth: e.weigth,
             price: e.price.price,
           };
         }),

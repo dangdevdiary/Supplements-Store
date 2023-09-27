@@ -8,19 +8,31 @@ import express, { Express } from "express";
 import * as authMiddleware from "../middlewares/auth";
 
 export const AnalysisRoutes = (app: Express) => {
-    const router = express.Router();
+  const router = express.Router();
 
-    router.get("/brand", [authMiddleware.verifyToken(), authMiddleware.require_admin()], brand.countProduct);
-    router.get(/^\/product_in_warehouse(\?)?(((limit=[0-9])|(page=[0-9])|query=\\w+)?(\%26)?){2}$/, [authMiddleware.verifyToken(), authMiddleware.require_admin()], inventory.analysis);
-    router.get("/top_sale", [authMiddleware.verifyToken(), authMiddleware.require_admin()], order.top_sale);
+  router.get(
+    "/brand",
+    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    brand.countProduct
+  );
+  router.get(
+    /^\/product_in_warehouse(\?)?(((limit=[0-9])|(page=[0-9])|query=\\w+)?(\%26)?){2}$/,
+    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    inventory.analysis
+  );
+  router.get(
+    "/top_sale",
+    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    order.top_sale
+  );
 
-    router.get("/overview", analysis.analysOverview);
-    router.get("/prices/:product_option_id", product_option.analysisPrices);
+  router.get("/overview", analysis.analysOverview);
+  router.get("/prices/:product_option_id", product_option.analysisPrices);
 
-    router.get("/sales", analysis.analysisSale);
-    router.post("/report_revenue", analysis.reportRevenue);
-    router.post("/report_inventory", analysis.reportInventory);
-    router.get("/tracking_product/:product_id", analysis.productTracking);
+  router.get("/sales", analysis.analysisSale);
+  router.post("/report_revenue", analysis.reportRevenue);
+  router.post("/report_inventory", analysis.reportInventory);
+  router.get("/tracking_product/:product_id", analysis.productTracking);
 
-    app.use("/api/analysis", router);
-}
+  app.use("/api/analysis", router);
+};

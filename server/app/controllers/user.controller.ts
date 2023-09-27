@@ -1,8 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import * as userServices from "../services/user.service";
-import { BadRequestError, isError } from "../utils/error";
+import { BadRequestError, isError, isJwtError } from "../utils/error";
 import err from "../middlewares/error";
-
+import createError from "http-errors";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} from "../utils/jwt";
 export const getAll = async (
   req: Request,
   res: Response,
@@ -61,9 +66,13 @@ export const getOne = async (
   res: Response,
   next: NextFunction
 ) => {
-  const user_id = Number(req.params.id);
-  const rs = await userServices.getOne(user_id);
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  try {
+    const user_id = Number(req.params.id);
+    const rs = await userServices.getOne(user_id);
+    return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updateOne = async (
@@ -155,7 +164,7 @@ export const changePassword = async (
   const { old_password, new_password } = req.body;
   if (!req.user) return next(err(BadRequestError("error"), res));
   const rs = await userServices.changePassword(
-    req.user?.user_id,
+    req.user?.userId,
     old_password,
     new_password
   );
@@ -190,4 +199,31 @@ export const resetPassword = async (
     Number(tokenId)
   );
   return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+};
+
+export const sendRefreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) throw createError.NotFound("refresh token not found!");
+    const payload = await verifyRefreshToken(refreshToken);
+    console.log(payload);
+    if (!payload) throw createError.BadRequest("token is not valid");
+    const accessToken = await signAccessToken(payload);
+    const newRefreshToken = await signRefreshToken(payload);
+    res.json({
+      token: accessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error) {
+    if (isJwtError(error))
+      return next({
+        status: 401,
+        message: error.message,
+      });
+    if (error instanceof Error) return next(error);
+  }
 };

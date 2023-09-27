@@ -51,14 +51,14 @@ export const create = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, description, ram, rom, color, price, brand_id } = req.body;
+  const { name, description, flavor, weigth, price, brand_id } = req.body;
   const file = req.file;
   if (!file)
     return next(err(BadRequestError("image for product is required!"), res));
   const { path } = file;
   const rs = await productServices.create(
     { name, description },
-    { ram, rom, color, price },
+    { flavor, weigth, price },
     path.replace(`public\\`, ""),
     brand_id
   );
@@ -82,7 +82,11 @@ export const update = async (
 ) => {
   const { id } = req.params;
   const { name, description, brand_id = -1 } = req.body;
-  const rs = await productServices.update(Number(id), { name, description }, brand_id);
+  const rs = await productServices.update(
+    Number(id),
+    { name, description },
+    brand_id
+  );
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };
 
@@ -117,9 +121,6 @@ export const canRate = async (
 ) => {
   if (!req.user) return next(err(BadRequestError("error"), res));
   const { product_id } = req.params;
-  const rs = await productServices.canRate(
-    Number(product_id),
-    req.user.user_id
-  );
+  const rs = await productServices.canRate(Number(product_id), req.user.userId);
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };

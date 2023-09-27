@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import express, { Express } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
@@ -8,6 +8,8 @@ import { Routes } from "./app/routes";
 import passport from "passport";
 import bodyParser from "body-parser";
 // import { craw } from "./app/utils/helpers";
+import { connectRedis } from "./app/database/connectRedis";
+import { HttpError } from "http-errors";
 
 AppDataSource.initialize()
   .then(() => {
@@ -26,10 +28,22 @@ AppDataSource.initialize()
     Routes.forEach((setUpRoute) => {
       setUpRoute(app);
     });
-
+    // catch error
+    app.use(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      (err: HttpError, _req: Request, res: Response, _next: NextFunction) => {
+        res.json({
+          message: err.message,
+          status: err.status || 500,
+        });
+      }
+    );
     app.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}.`);
     });
+  })
+  .then(async () => {
+    await connectRedis();
   })
   // .then(() => {
   //   craw().catch(() => {

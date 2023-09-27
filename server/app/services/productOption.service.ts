@@ -11,9 +11,8 @@ import { productRepository } from "./product.service";
 const productOptionRepository = AppDataSource.getRepository(ProductOption);
 
 export interface ProductOptionInterface {
-  color: string;
-  ram: string;
-  rom: string;
+  flavor: string;
+  weigth: string;
   price: number;
 }
 
@@ -24,14 +23,8 @@ export const create = async (
 ) => {
   const product = await productRepository.findOneBy({ id: product_id });
   if (!product) return BadRequestError("product not found");
-  if (
-    product_options.color &&
-    product_options.ram &&
-    product_options.rom &&
-    product_options.price &&
-    image_path
-  ) {
-    const { color, ram, rom, price } = product_options;
+  if (product_options.price && image_path) {
+    const { flavor, weigth, price } = product_options;
 
     // price
     const priceRepo = AppDataSource.getRepository(Price);
@@ -40,23 +33,32 @@ export const create = async (
       price: price,
     });
     const new_price = await priceRepo.save(tempPrice);
-    await priceHistoryRepo.save(priceHistoryRepo.create({
-      old_price: price,
-      new_price: price,
-      price: new_price
-    }));
+    await priceHistoryRepo.save(
+      priceHistoryRepo.create({
+        old_price: price,
+        new_price: price,
+        price: new_price,
+      })
+    );
 
     const warehouseRepo = AppDataSource.getRepository(Warehouse);
     const imageRepo = AppDataSource.getRepository(Image);
 
     const new_options = productOptionRepository.create({
-      color,
-      ram,
-      rom,
+      flavor,
+      weigth,
       price: new_price,
       product,
-      warehouse: await warehouseRepo.save(warehouseRepo.create({ quantity: 0 })),
-      image: await imageRepo.save(imageRepo.create({ type: EnumTypeImage.options, product: product, image_url: image_path }))
+      warehouse: await warehouseRepo.save(
+        warehouseRepo.create({ quantity: 1 })
+      ),
+      image: await imageRepo.save(
+        imageRepo.create({
+          type: EnumTypeImage.options,
+          product: product,
+          image_url: image_path,
+        })
+      ),
     });
     return await productOptionRepository.save(new_options);
   }
@@ -65,9 +67,7 @@ export const create = async (
 
 export const deleteOne = async (id: number) => {
   const result = await productOptionRepository.delete({ id });
-  return result.affected
-    ? success()
-    : failed();
+  return result.affected ? success() : failed();
 };
 
 export const updateOne = async (id: number, data: ProductOptionInterface) => {
@@ -79,23 +79,25 @@ export const updateOne = async (id: number, data: ProductOptionInterface) => {
       price: true,
     },
   });
-  const { ram, rom, color, price } = data;
+  const { weigth, flavor, price } = data;
   if (!option) return BadRequestError("option not found");
   let price_update = 0;
   if (price) {
     const priceRepo = AppDataSource.getRepository(Price);
     const priceHistoty = AppDataSource.getRepository(PriceHistory);
-    await priceHistoty.save(priceHistoty.create({
-      old_price: option.price.price,
-      new_price: price,
-      price: option.price
-    }));
-    await priceRepo.update({ id: option.price.id }, { price: (price) });
+    await priceHistoty.save(
+      priceHistoty.create({
+        old_price: option.price.price,
+        new_price: price,
+        price: option.price,
+      })
+    );
+    await priceRepo.update({ id: option.price.id }, { price: price });
     price_update = 1;
   }
-  return ram || rom || color
+  return flavor || weigth
     ? {
-        ...(await productOptionRepository.update({ id }, { ram, rom, color })),
+        ...(await productOptionRepository.update({ id }, { flavor, weigth })),
         price_update,
       }
     : { price_update };
@@ -112,28 +114,35 @@ export const updateStock = async (id: number, quantity: number) => {
   });
   if (!option) return BadRequestError("option not found");
   const warehouseRepo = AppDataSource.getRepository(Warehouse);
-  return (await warehouseRepo.update({ id: option.warehouse.id}, { quantity })).affected ? success() : failed();
+  return (await warehouseRepo.update({ id: option.warehouse.id }, { quantity }))
+    .affected
+    ? success()
+    : failed();
 };
 
-
 export const updatePrice = async (product_option_id: number, price: number) => {
-  if(!price) return BadRequestError("new price empty");
+  if (!price) return BadRequestError("new price empty");
   const priceRepo = AppDataSource.getRepository(Price);
   const priceHistoryRepo = AppDataSource.getRepository(PriceHistory);
   const productOption = await productOptionRepository.findOne({
     where: {
-      id: product_option_id
+      id: product_option_id,
     },
     relations: {
-      price: true
-    }
+      price: true,
+    },
   });
-  if(!productOption) return BadRequestError("product option not found");
-  await priceHistoryRepo.save(priceHistoryRepo.create({
-    old_price: productOption.price.price,
-    new_price: price,
-    price: productOption.price
-  }));
+  if (!productOption) return BadRequestError("product option not found");
+  await priceHistoryRepo.save(
+    priceHistoryRepo.create({
+      old_price: productOption.price.price,
+      new_price: price,
+      price: productOption.price,
+    })
+  );
 
-  return (await priceRepo.update({ id: productOption.price.id }, { price })).affected ? success() : failed();
-}
+  return (await priceRepo.update({ id: productOption.price.id }, { price }))
+    .affected
+    ? success()
+    : failed();
+};

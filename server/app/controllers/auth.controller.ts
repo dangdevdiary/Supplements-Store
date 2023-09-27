@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { BadRequestError, isError } from "../utils/error";
 import * as userServices from "../services/user.service";
 import bcrypt from "bcryptjs";
 import err from "../middlewares/error";
+import { signAccessToken, signRefreshToken } from "../utils/jwt";
+import createError from "http-errors";
 
 export const login = async (
   req: Request,
@@ -22,22 +23,23 @@ export const login = async (
     if (bcrypt.compareSync(password, user.password))
       return res.json({
         message: "login success",
-        token: jwt.sign(
-          {
-            user_id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-          },
-          process.env.JWT_SECRET_KEY || "nhan",
-          {
-            expiresIn: "1d",
-          }
-        ),
+        token: await signAccessToken({
+          userId: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        }),
+        refreshToken: await signRefreshToken({
+          userId: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        }),
       });
-    else return next(err(BadRequestError("password is incorrect!"), res));
+    else return next(createError.BadRequest("Password is incorrect!"));
   }
-  return next(err(BadRequestError("email or password cannot be empty!"), res));
+
+  return next(createError.BadRequest("email or password cannot be empty!"));
 };
 
 export const testLogin = (req: Request, res: Response) => {

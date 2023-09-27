@@ -124,7 +124,7 @@ export const create = async (
     const newProduct = await productRepository.save(productObj);
 
     const productOptionRepository = AppDataSource.getRepository(ProductOption);
-    const { color, ram, rom, price } = options;
+    const { weigth, flavor, price } = options;
 
     // price
     const priceRepo = AppDataSource.getRepository(Price);
@@ -166,20 +166,18 @@ export const create = async (
       })
     );
     const opt =
-      color && ram && rom
+      weigth && flavor
         ? productOptionRepository.create({
-            color,
-            ram,
-            rom,
+            weigth,
+            flavor,
             product: newProduct,
             price: newPrice,
             warehouse: newWarehouse,
             image: image_opt,
           })
         : productOptionRepository.create({
-            color: "black",
-            ram: "8GB",
-            rom: "128GB",
+            flavor: "none",
+            weigth: "1kg",
             product: newProduct,
             price: newPrice,
             warehouse: newWarehouse,
@@ -239,9 +237,8 @@ export const getOneById = async (id: number) => {
         product_options: product.productOptions.map((e) => {
           return {
             product_option_id: e.id,
-            color: e.color,
-            ram: e.ram,
-            rom: e.rom,
+            flavor: e.flavor,
+            weigth: e.weigth,
             price: e.price.price,
             quantity: e.warehouse.quantity,
             image: e.image,
@@ -302,14 +299,14 @@ export const addImages = async (product_id: number, image: string[]) => {
   );
 };
 
-export const canRate = async (product_id: number, user_id: number) => {
+export const canRate = async (product_id: number, userId: number) => {
   const workRepo = AppDataSource.getRepository(WorkQueue);
   const data = await workRepo.findOneBy({
     product: {
       id: product_id,
     },
     user: {
-      id: user_id,
+      id: userId,
     },
   });
 

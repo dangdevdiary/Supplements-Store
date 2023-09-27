@@ -43,11 +43,11 @@ const generateContent = async (type: EnumTypeNotify, id: number) => {
 export const addNewNoti = async (
   type: EnumTypeNotify,
   id: number,
-  user_id: number
+  userId: number
 ) => {
   if (!type) return BadRequestError("type empty");
   if (!(type in EnumTypeNotify)) return BadRequestError("type not valid");
-  const user = await userRepo.findOneBy({ id: user_id });
+  const user = await userRepo.findOneBy({ id: userId });
   if (!user) return BadRequestError("user not found");
   const new_noti = await notiRepo.save(
     notiRepo.create({
@@ -66,12 +66,12 @@ export enum getType {
   ALL,
 }
 
-export const getNoti = async (user_id: number, type: getType) => {
+export const getNoti = async (userId: number, type: getType) => {
   const user = await userRepo.findOne({
     relations: {
       notifications: true,
     },
-    where: { id: user_id },
+    where: { id: userId },
   });
   if (!user) return BadRequestError("user not found");
 
@@ -84,11 +84,14 @@ export const getNoti = async (user_id: number, type: getType) => {
         return;
       })
     );
-    await userRepo.update({
-        id: user_id
-    }, {
-        unread_message: 0
-    });
+    await userRepo.update(
+      {
+        id: userId,
+      },
+      {
+        unread_message: 0,
+      }
+    );
     return {
       data: noti.map((e) => e),
     };
@@ -101,19 +104,22 @@ export const getNoti = async (user_id: number, type: getType) => {
         return await markAsRead(e);
       })
     );
-    await userRepo.update({
-        id: user_id
-    }, {
-        unread_message: 0
-    });
+    await userRepo.update(
+      {
+        id: userId,
+      },
+      {
+        unread_message: 0,
+      }
+    );
     return {
       data: noti.map((e) => e),
     };
   }
 };
 
-const markAsRead = async (noti: Notification) => { 
-  return (await notiRepo.update({ id: noti.id }, { is_read: true })).affected 
+const markAsRead = async (noti: Notification) => {
+  return (await notiRepo.update({ id: noti.id }, { is_read: true })).affected
     ? success()
     : failed();
 };
