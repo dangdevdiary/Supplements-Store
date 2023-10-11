@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import * as productServices from "../services/product.service";
 import err from "../middlewares/error";
 import { BadRequestError, isError } from "../utils/error";
+import { User } from "../utils/user";
+import createHttpError from "http-errors";
 
 export const getAll = async (
   req: Request,
@@ -11,14 +13,14 @@ export const getAll = async (
   const {
     limit = 10,
     page = 1,
-    brand_id,
+    brandId,
     price_min,
     price_max,
     rate,
     search,
     order = "newest",
   } = req.query;
-  if (!brand_id && !price_max && !price_min && !rate) {
+  if (!brandId && !price_max && !price_min && !rate) {
     const rs = await productServices.getAll(
       Number(limit),
       Number(page),
@@ -32,7 +34,7 @@ export const getAll = async (
       Number(limit),
       Number(page),
       {
-        brand_id: brand_id ? Number(brand_id) : undefined,
+        brandId: brandId ? Number(brandId) : undefined,
         price: {
           min: price_min ? Number(price_min) : undefined,
           max: price_max ? Number(price_max) : undefined,
@@ -51,18 +53,33 @@ export const create = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, description, flavor, weigth, price, brand_id } = req.body;
-  const file = req.file;
-  if (!file)
-    return next(err(BadRequestError("image for product is required!"), res));
-  const { path } = file;
-  const rs = await productServices.create(
-    { name, description },
-    { flavor, weigth, price },
-    path.replace(`public\\`, ""),
-    brand_id
-  );
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  try {
+    const {
+      name,
+      description,
+      flavor,
+      weigth,
+      price,
+      brandId,
+      productionDate,
+      expirationDate,
+    } = req.body;
+    const file = req.file;
+    if (!file)
+      return next(createHttpError.BadRequest("image for product is required!"));
+    const { path } = file;
+    const rs = await productServices.create(
+      { name, description, productionDate, expirationDate },
+      { flavor, weigth, price },
+      path.replace(`public\\`, ""),
+      brandId
+    );
+    return createHttpError.isHttpError(rs)
+      ? next(rs)
+      : res.status(201).json(rs);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getOneById = async (
@@ -70,9 +87,15 @@ export const getOneById = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
-  const rs = await productServices.getOneById(Number(id));
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  try {
+    const { id } = req.params;
+    const rs = await productServices.getOneById(Number(id));
+    return createHttpError.isHttpError(rs)
+      ? next(rs)
+      : res.status(200).json(rs);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const update = async (
@@ -81,11 +104,11 @@ export const update = async (
   next: NextFunction
 ) => {
   const { id } = req.params;
-  const { name, description, brand_id = -1 } = req.body;
+  const { name, description, brandId = -1 } = req.body;
   const rs = await productServices.update(
     Number(id),
     { name, description },
-    brand_id
+    brandId
   );
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };
@@ -120,7 +143,10 @@ export const canRate = async (
   next: NextFunction
 ) => {
   if (!req.user) return next(err(BadRequestError("error"), res));
-  const { product_id } = req.params;
-  const rs = await productServices.canRate(Number(product_id), req.user.userId);
+  const { productId } = req.params;
+  const rs = await productServices.canRate(
+    Number(productId),
+    (req.user as User).userId
+  );
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };

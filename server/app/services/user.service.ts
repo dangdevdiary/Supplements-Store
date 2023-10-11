@@ -10,6 +10,9 @@ import sendMail from "../utils/mailer";
 import jwt from "jsonwebtoken";
 import { Token } from "../entities/token.entity";
 import fs from "fs";
+import { User as IUser } from "../utils/user";
+import createHttpError from "http-errors";
+import { signAccessToken, signRefreshToken } from "../utils/jwt";
 enum UserRole {
   ADMIN = "admin",
   MEMBER = "member",
@@ -290,10 +293,10 @@ export const addAvatar = async (uid: number, pathImg: string) => {
 
   if (user?.avatar?.id) {
     try {
-      fs.unlinkSync("./public/" + user.avatar.image_url);
+      fs.unlinkSync("./public/" + user.avatar.imageUrl);
       const rsUpdate = await imageRepo.update(
-        { image_url: user.avatar.image_url },
-        { image_url: pathImg }
+        { imageUrl: user.avatar.imageUrl },
+        { imageUrl: pathImg }
       );
       return rsUpdate ? rsUpdate : BadRequestError("Fail");
     } catch (error) {
@@ -305,7 +308,7 @@ export const addAvatar = async (uid: number, pathImg: string) => {
   const rs = await imageRepo.save(
     imageRepo.create({
       type: EnumTypeImage.avatar,
-      image_url: pathImg,
+      imageUrl: pathImg,
       user,
     })
   );
@@ -511,4 +514,59 @@ export const changePassword = async (
   ).affected
     ? success()
     : failed();
+};
+
+export const registerGoogleAccoutToDb = async (user: Partial<IUser>) => {
+  const { email, firstName, lastName, avatar } = user;
+  if (!email)
+    return createHttpError.InternalServerError(
+      "error when check profile google user"
+    );
+  const existUser = await userRepository.findOneBy({
+    email,
+  });
+  if (existUser) {
+    return {
+      status: "success",
+      token: await signAccessToken({
+        firstName: existUser.firstName,
+        lastName: existUser.lastName,
+        role: existUser.role,
+        userId: existUser.id,
+      }),
+      refreshToken: await signRefreshToken({
+        firstName: existUser.firstName,
+        lastName: existUser.lastName,
+        role: existUser.role,
+        userId: existUser.id,
+      }),
+    };
+  }
+  const newGoogleUser = await userRepository.save(
+    userRepository.create({
+      email,
+      firstName: firstName || "User",
+      lastName: lastName || "Google",
+      password: await bcryptjs.hash("12345678", 8),
+      verifyAt: new Date(Date.now()).toString(),
+    })
+  );
+  if (newGoogleUser.id && avatar) {
+    await addAvatar(newGoogleUser.id, avatar);
+  }
+  const token = await signAccessToken({
+    firstName: newGoogleUser.firstName,
+    lastName: newGoogleUser.lastName,
+    role: newGoogleUser.role,
+    userId: newGoogleUser.id,
+  });
+  const refreshToken = await signRefreshToken({
+    firstName: newGoogleUser.firstName,
+    lastName: newGoogleUser.lastName,
+    role: newGoogleUser.role,
+    userId: newGoogleUser.id,
+  });
+  return newGoogleUser
+    ? { status: "success", token, refreshToken }
+    : createHttpError.BadRequest("can't create google user in db");
 };

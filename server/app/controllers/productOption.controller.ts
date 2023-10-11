@@ -3,29 +3,36 @@ import * as productOptionServices from "../services/productOption.service";
 import * as analysisServices from "../services/analysis.service";
 import { BadRequestError, isError } from "../utils/error";
 import err from "../middlewares/error";
+import createHttpError from "http-errors";
 
 export const create = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { flavor, weigth, price } = req.body;
-  const { product_id } = req.params;
-  const file = req.file;
+  try {
+    const { flavor, weigth, price } = req.body;
+    const { productId } = req.params;
+    const file = req.file;
 
-  if (!file)
-    return next(err(BadRequestError("image for product is required!"), res));
-  const { path } = file;
-  const rs = await productOptionServices.create(
-    Number(product_id),
-    {
-      flavor,
-      weigth,
-      price,
-    },
-    path.replace(`public\\`, ``)
-  );
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+    if (!file)
+      return next(createHttpError.BadRequest("image for product is required!"));
+    const { path } = file;
+    const rs = await productOptionServices.create(
+      Number(productId),
+      {
+        flavor,
+        weigth,
+        price,
+      },
+      path.replace(`public\\`, ``)
+    );
+    return createHttpError.isHttpError(rs)
+      ? next(rs)
+      : res.status(201).json(rs);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const deleteOne = async (

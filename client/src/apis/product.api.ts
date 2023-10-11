@@ -30,21 +30,21 @@ const productsApi = {
       },
     });
   },
-  async deleteProduct(product_id: number) {
-    return http.delete(`/product/${product_id}`);
+  async deleteProduct(productId: number) {
+    return http.delete(`/product/${productId}`);
   },
   async updateProduct(
-    product_id: number,
+    productId: number,
     data: {
       name: string;
       description: string;
-      brand_id: number;
+      brandId: number;
     }
   ) {
-    return http.put(`product/${product_id}`, data);
+    return http.put(`product/${productId}`, data);
   },
-  async createOption(product_id: number, data: any) {
-    return await http.post(`product_option/${product_id}`, data, {
+  async createOption(productId: number, data: any) {
+    return await http.post(`product_option/${productId}`, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -64,8 +64,8 @@ const productsApi = {
   ) {
     return http.put(`product_option/${product_option_id}`, data);
   },
-  async createSpec(product_id: number, key: string, value: string) {
-    return await http.post(`specification/${product_id}`, [{ key, value }]);
+  async createSpec(productId: number, key: string, value: string) {
+    return await http.post(`specification/${productId}`, [{ key, value }]);
   },
   async deleteSpec(spec_id: number) {
     return await http.delete(`specification/${spec_id}`);
@@ -73,8 +73,8 @@ const productsApi = {
   async updateOneSpec(spec_id: number, value: string) {
     return await http.put(`specification/${spec_id}`, { value });
   },
-  async trackingProduct(product_id: number) {
-    return await http.get(`analysis/tracking_product/${product_id}`);
+  async trackingProduct(productId: number) {
+    return await http.get(`analysis/tracking_product/${productId}`);
   },
 };
 

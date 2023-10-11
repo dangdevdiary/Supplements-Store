@@ -8,12 +8,12 @@ export const NotifyRoutes = (app: Express) => {
 
   router.post("/add", notification.addNewNoti);
   router.get(
-    "/get_all/:user_id(\\d+)",
+    "/get_all/:userId(\\d+)",
     [authMiddleware.verifyToken()],
     notification.getAllNoti
   );
   router.get(
-    "/get_unread/:user_id(\\d+)",
+    "/get_unread/:userId(\\d+)",
     [authMiddleware.verifyToken()],
     notification.getUnreadNoti
   );

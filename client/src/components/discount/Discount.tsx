@@ -75,10 +75,10 @@ function Discount() {
                   <b className='text-xl'>{coupon.type === 'AMOUNT' ? formatPrice(coupon.value) : coupon.value + '%'}</b>
                 </span>
                 <span className='text-sm'>
-                  {t('discount.startDate')}: {coupon.start_date}
+                  {t('discount.startDate')}: {coupon.startDate}
                 </span>
                 <span className='text-sm'>
-                  {t('discount.endDate')}: {coupon.end_date}
+                  {t('discount.endDate')}: {coupon.endDate}
                 </span>
               </div>
               <div className='absolute inset-x-1 bottom-1 flex items-center justify-between border p-1'>

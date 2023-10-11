@@ -1,5 +1,6 @@
+/* eslint-disable jsx-a11y/no-redundant-roles */
 import { useForm } from 'react-hook-form';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { AiOutlineMail, AiOutlineGoogle, AiOutlineLock, AiFillEyeInvisible, AiFillEye } from 'react-icons/ai';
 import { FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -9,16 +10,16 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
 import authApi from 'src/apis/auth.api';
 import { toast } from 'react-toastify';
-import { AppContext } from 'src/contexts/app.context';
 import { isAxiosErr } from 'src/utils/error';
 import { useDispatch } from 'react-redux';
 import { getCart } from 'src/slices/cart.slice';
 import { useTranslation } from 'react-i18next';
 import { reset } from 'src/slices/user.slice';
+import { setIsAuth } from 'src/slices/auth.slice';
+import { saveAccessToken, saveRefreshToken } from 'src/utils/auth';
 type FormDataLogin = LoginSchema;
 function Login() {
   const { t } = useTranslation('login');
-  const { setIsAuth } = useContext(AppContext);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -35,9 +36,11 @@ function Login() {
   const onSubmit = handleSubmit((data) => {
     loginMutation.mutate(data, {
       onSuccess: (data) => {
-        dispatch(reset());
-        if (data.data.token && data.data.message) {
-          setIsAuth(true);
+        if (data.data.token && data.data.refreshToken) {
+          dispatch(setIsAuth(true));
+          dispatch(reset());
+          saveAccessToken(data.data.token);
+          saveRefreshToken(data.data.refreshToken);
           if (location.state) {
             navigate(location.state.from);
           } else {
@@ -53,6 +56,9 @@ function Login() {
       },
     });
   });
+  const handleLoginGoogle = () => {
+    window.open('http://localhost:3000/api/auth/google', '_self');
+  };
   const [showPass, setShowPass] = useState<boolean>(false);
   return (
     <div className='to-white-200 flex w-full flex-col items-center justify-center bg-gradient-to-r from-gray-200 via-gray-300 px-6 py-4 text-center text-white md:py-10 md:px-20'>
@@ -72,9 +78,13 @@ function Login() {
               <span className='group/lk mx-1 rounded-full border-2 border-blue-500 p-3 duration-300 hover:bg-form hover:text-white'>
                 <FaLinkedinIn className='text-xl text-blue-500 group-hover/lk:text-white' />
               </span>
-              <span className='group/gg mx-1 rounded-full border-2 border-red-500 p-3 duration-300 hover:bg-red-500 hover:text-white'>
+              <button
+                role='button'
+                onClick={handleLoginGoogle}
+                className='group/gg mx-1 rounded-full border-2 border-red-500 p-3 duration-300 hover:bg-red-500 hover:text-white'
+              >
                 <AiOutlineGoogle className='text-xl text-red-500 group-hover/gg:text-white' />
-              </span>
+              </button>
             </div>
             <p className='my-3 text-black '>{t('login.login email')}</p>
             <form onSubmit={onSubmit} className='flex flex-col items-center' noValidate>

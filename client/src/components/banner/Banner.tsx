@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsChevronCompactLeft, BsChevronCompactRight } from 'react-icons/bs';
 import { RxDotFilled } from 'react-icons/rx';
-import banner1 from 'src/assets/img/banner-1.webp';
-import banner2 from 'src/assets/img/banner-2.webp';
-import banner3 from 'src/assets/img/banner-3.webp';
+import banner1 from 'src/assets/img/banner1.jpg';
+import banner2 from 'src/assets/img/banner2.jpg';
+import banner3 from 'src/assets/img/banner3.jpg';
 
 const images = [banner1, banner2, banner3];
 const variants = {

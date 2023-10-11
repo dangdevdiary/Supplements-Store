@@ -7,7 +7,7 @@ export const CouponRoutes = (app: Express) => {
 
   router.post(
     "/create",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     coupon.create
   );
   router.post("/apply", [authMiddleware.verifyToken()], coupon.applyCoupon);
@@ -15,7 +15,7 @@ export const CouponRoutes = (app: Express) => {
   router.get("/get_all", coupon.getAllCoupon);
   router.delete(
     "/delete/:coupon_id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     coupon.deleteCoupon
   );
 

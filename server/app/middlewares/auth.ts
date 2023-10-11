@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import passport from "passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
+import { Strategy as GoogleStrategy, Profile } from "passport-google-oauth20";
 import { AppDataSource } from "../database";
 import { User } from "../entities/user.entity";
-enum jwtError {
-  expired = "Token has expried!",
-  invalid = "Token is not valid!",
-}
+import { User as IUser } from "../utils/user";
+
 passport.use(
   "authz",
   new Strategy(
@@ -14,7 +15,7 @@ passport.use(
       secretOrKey: process.env.JWT_ACCESS_KEY,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
-    (payload, done) => {
+    (payload: IUser, done) => {
       const { userId, role } = payload;
       if (!userId || !role) {
         return done("token is not valid!");
@@ -31,15 +32,7 @@ passport.use(
       secretOrKey: process.env.JWT_ACCESS_KEY,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
-    async (
-      payload: {
-        userId: number;
-        firstName: string;
-        lastName: string;
-        role: string;
-      },
-      done
-    ) => {
+    async (payload: IUser, done) => {
       const { userId, firstName, lastName, role } = payload;
       const userRepo = AppDataSource.getRepository(User);
       const user = await userRepo.findOneBy({ id: userId });
@@ -52,13 +45,7 @@ passport.use(
         user.id != userId ||
         user.role != role
       ) {
-        return done(
-          {
-            status: 401,
-            message: jwtError.invalid,
-          },
-          false
-        );
+        return done(null, false);
       }
       return done(null, {
         userId,
@@ -70,22 +57,45 @@ passport.use(
   )
 );
 
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID || "dasdasdasd",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "dasdasdasd",
+      callbackURL: "http://localhost:3000/api/auth/google/callback",
+    },
+    function (_accessToken, _refreshToken, profile, cb) {
+      cb(null, {
+        userId: Number(profile.id),
+        firstName: profile._json.family_name,
+        lastName: profile._json.given_name,
+        role: "member",
+        avatar: profile._json.picture,
+        email: profile._json.email,
+      });
+    }
+  )
+);
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser(
+  (obj: IUser | Profile | Partial<Profile> | Partial<IUser>, done) => {
+    done(null, obj);
+  }
+);
+
 export const verifyToken = () => {
   return passport.authenticate("jwt", { session: false });
 };
-
-export const require_admin = () => {
-  return passport.authorize("authz", { failWithError: false });
+export const googleAuth = () => {
+  return passport.authenticate("google", {
+    session: true,
+    scope: ["profile", "email"],
+  });
 };
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface User {
-      userId: number;
-      firstName: string;
-      lastName: string;
-      role: string;
-    }
-  }
-}
+export const requireAdmin = () => {
+  return passport.authorize("authz", { failWithError: false });
+};

@@ -3,8 +3,8 @@ export type Coupon = {
   code: string;
   type: string;
   value: number;
-  start_date: string;
-  end_date: string;
+  startDate: string;
+  endDate: string;
   active: boolean;
   number: number;
 };

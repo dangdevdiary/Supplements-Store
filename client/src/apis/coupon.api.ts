@@ -20,13 +20,13 @@ const couponApi = {
       order_id: orderId,
     });
   },
-  createCoupon(number: number, value: number, type: string, start_date: string, end_date: string) {
+  createCoupon(number: number, value: number, type: string, startDate: string, endDate: string) {
     return http.post(`coupon/create`, {
       number,
       value,
       type,
-      start_date,
-      end_date,
+      startDate,
+      endDate,
       length: 8,
     });
   },

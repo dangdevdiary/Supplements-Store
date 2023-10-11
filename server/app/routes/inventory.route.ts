@@ -8,37 +8,37 @@ export const InventoryRoutes = (app: Express) => {
 
   router.post(
     "/inbound/:product_option_id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.increaseStock
   );
   router.post(
     "/outbound/:product_option_id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.decreaseStock
   );
   router.post(
     "/create_inbound_note",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.createInboundNote
   );
   router.get(
     "/inbound_note/:id(\\d+)",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.getInboundNote
   );
   router.post(
     "/inbound_note/:id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.processInboundNote
   );
   router.delete(
     "/inbound_note/:id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.deleteInboundNote
   );
   router.get(
     /^\/inbound_note(\?)?(((limit=[0-9])|(page=[0-9]))?(\%26)?){2}$/,
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.getAllInboundNote
   );
 

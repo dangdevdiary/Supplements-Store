@@ -1,10 +1,11 @@
+import createHttpError from "http-errors";
 import { AppDataSource } from "../database";
 import { EnumTypeImage, Image } from "../entities/image.entity";
 import { Price } from "../entities/price.entity";
 import { PriceHistory } from "../entities/priceHistoty.entity";
 import { ProductOption } from "../entities/productOption.entity";
 import { Warehouse } from "../entities/warehouse.entity";
-import { BadRequestError } from "../utils/error";
+import { BadRequestError, catchError } from "../utils/error";
 import { failed, success } from "../utils/response";
 import { productRepository } from "./product.service";
 
@@ -17,52 +18,56 @@ export interface ProductOptionInterface {
 }
 
 export const create = async (
-  product_id: number,
+  productId: number,
   product_options: ProductOptionInterface,
-  image_path: string
+  imagePath: string
 ) => {
-  const product = await productRepository.findOneBy({ id: product_id });
-  if (!product) return BadRequestError("product not found");
-  if (product_options.price && image_path) {
-    const { flavor, weigth, price } = product_options;
+  try {
+    const product = await productRepository.findOneBy({ id: productId });
+    if (!product) return createHttpError.BadRequest("product not found");
+    if (product_options.price && imagePath) {
+      const { flavor, weigth, price } = product_options;
 
-    // price
-    const priceRepo = AppDataSource.getRepository(Price);
-    const priceHistoryRepo = AppDataSource.getRepository(PriceHistory);
-    const tempPrice = priceRepo.create({
-      price: price,
-    });
-    const new_price = await priceRepo.save(tempPrice);
-    await priceHistoryRepo.save(
-      priceHistoryRepo.create({
-        old_price: price,
-        new_price: price,
-        price: new_price,
-      })
-    );
-
-    const warehouseRepo = AppDataSource.getRepository(Warehouse);
-    const imageRepo = AppDataSource.getRepository(Image);
-
-    const new_options = productOptionRepository.create({
-      flavor,
-      weigth,
-      price: new_price,
-      product,
-      warehouse: await warehouseRepo.save(
-        warehouseRepo.create({ quantity: 1 })
-      ),
-      image: await imageRepo.save(
-        imageRepo.create({
-          type: EnumTypeImage.options,
-          product: product,
-          image_url: image_path,
+      // price
+      const priceRepo = AppDataSource.getRepository(Price);
+      const priceHistoryRepo = AppDataSource.getRepository(PriceHistory);
+      const tempPrice = priceRepo.create({
+        price: price,
+      });
+      const new_price = await priceRepo.save(tempPrice);
+      await priceHistoryRepo.save(
+        priceHistoryRepo.create({
+          old_price: price,
+          new_price: price,
+          price: new_price,
         })
-      ),
-    });
-    return await productOptionRepository.save(new_options);
+      );
+
+      const warehouseRepo = AppDataSource.getRepository(Warehouse);
+      const imageRepo = AppDataSource.getRepository(Image);
+
+      const new_options = productOptionRepository.create({
+        flavor,
+        weigth,
+        price: new_price,
+        product,
+        warehouse: await warehouseRepo.save(
+          warehouseRepo.create({ quantity: 1 })
+        ),
+        image: await imageRepo.save(
+          imageRepo.create({
+            type: EnumTypeImage.options,
+            product: product,
+            imageUrl: imagePath,
+          })
+        ),
+      });
+      return await productOptionRepository.save(new_options);
+    }
+    return createHttpError.BadRequest("please fill all the information");
+  } catch (error) {
+    return catchError(error, "something went wrong when add product option");
   }
-  return BadRequestError("please fill all the information");
 };
 
 export const deleteOne = async (id: number) => {

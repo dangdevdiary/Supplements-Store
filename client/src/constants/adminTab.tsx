@@ -25,7 +25,7 @@ export const dashboard_tab: dashboardTabInterface[] = [
   { name: 'home', component: <MainDashboard />, link: '/' },
   { name: 'products', component: <ManageProduct />, link: '/product' },
   { name: 'product', component: <ProductForm />, link: '/product/form' },
-  { name: 'product', component: <DetailProduct />, link: '/product/detail/:product_id' },
+  { name: 'product', component: <DetailProduct />, link: '/product/detail/:productId' },
   { name: 'product', component: <DetailProductOption />, link: '/product/detail/option/:product_option_id' },
   { name: 'brand', component: <ManageBrand />, link: '/brand' },
   { name: 'coupon', component: <ManageCoupon />, link: '/coupon' },

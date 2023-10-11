@@ -8,10 +8,10 @@ export const ProductOptionRoutes = (app: Express) => {
   const router = express.Router();
 
   router.post(
-    "/:product_id",
+    "/:productId",
     [
       authMiddleware.verifyToken(),
-      authMiddleware.require_admin(),
+      authMiddleware.requireAdmin(),
       upload.single("image"),
       validation.validateImageExtension,
     ],
@@ -19,22 +19,22 @@ export const ProductOptionRoutes = (app: Express) => {
   );
   router.delete(
     "/:id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     productOption.deleteOne
   );
   router.put(
     "/:id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     productOption.updateOne
   );
   router.patch(
     "/:id/update_stock",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     productOption.updateStock
   );
   router.patch(
     "/:id/update_price",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     productOption.updatePrice
   );
 

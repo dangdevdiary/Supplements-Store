@@ -6,10 +6,10 @@ let key: string;
 const token = localStorage.getItem('token');
 if (token) {
   const user = pick<{
-    user_id: string;
+    userId: string;
     lastName: string;
-  }>(jwtDecode(token), ['user_id', 'lastName']);
-  key = user.lastName && user.user_id ? user.lastName + user.user_id : 'user';
+  }>(jwtDecode(token), ['userId', 'lastName']);
+  key = user.lastName && user.userId ? user.lastName + user.userId : 'user';
 }
 export const saveCartItemToLocal = (value: CartItem[]) => {
   const saveValue = JSON.stringify(value);
@@ -20,10 +20,10 @@ export const getCartItemFromLocal = (): CartItem[] => {
   const token = localStorage.getItem('token');
   if (token) {
     const user = pick<{
-      user_id: string;
+      userId: string;
       lastName: string;
-    }>(jwtDecode(token), ['user_id', 'lastName']);
-    keyOther = user.lastName && user.user_id ? user.lastName + user.user_id : 'user';
+    }>(jwtDecode(token), ['userId', 'lastName']);
+    keyOther = user.lastName && user.userId ? user.lastName + user.userId : 'user';
   }
   if (keyOther) {
     const result = localStorage.getItem(keyOther);

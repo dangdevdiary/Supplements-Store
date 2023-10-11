@@ -64,9 +64,9 @@ function Comments({
 }: Props) {
   const [feedback, setFeedback] = useState<Feedback>({
     comment: '',
-    product_id: 0,
+    productId: 0,
     rate: 5,
-    user_id: 0,
+    userId: 0,
   });
   const [edit, setEdit] = useState<boolean>(false);
   const commentRef = useRef<HTMLDivElement>(null);
@@ -75,8 +75,8 @@ function Comments({
     setFeedback({
       ...feedback,
       rate: rating || 5,
-      product_id: Number(productId),
-      user_id: Number(userId),
+      productId: Number(productId),
+      userId: Number(userId),
     });
     // setEdit(canRate.isRated);
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -30,11 +30,15 @@ export class Product {
   })
   description!: string;
 
-  @Column()
-  productionDate!: Date;
+  @Column({
+    type: "date",
+  })
+  productionDate!: string;
 
-  @Column()
-  expirationDate!: Date;
+  @Column({
+    type: "date",
+  })
+  expirationDate!: string;
 
   @CreateDateColumn()
   createAt!: Date;
@@ -46,7 +50,7 @@ export class Product {
     onDelete: "CASCADE",
   })
   @JoinColumn({
-    name: "brand_id",
+    name: "brandId",
   })
   brand!: Brand;
 

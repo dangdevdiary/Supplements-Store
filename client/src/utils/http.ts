@@ -12,6 +12,8 @@ class Http {
       headers: { 'Content-Type': 'application/json' },
     });
     this.instance.interceptors.request.use((config) => {
+      if (!this.token) this.token = getAccessToken();
+      config.withCredentials = true;
       config.headers['Authorization'] = 'bearer ' + this.token;
       return config;
     });

@@ -67,7 +67,7 @@ export const productInWarehouse = async (
           return {
             product_option_id: e.id,
             quantity: e.warehouse.quantity,
-            images: e.image?.image_url,
+            images: e.image?.imageUrl,
             name: e.product.name,
             flavor: e.flavor,
             weigth: e.weigth,
@@ -106,7 +106,7 @@ export const top_sale = async () => {
   });
 
   interface product {
-    product_id: number;
+    productId: number;
 
     product_options: {
       product_option_id: number;
@@ -120,10 +120,10 @@ export const top_sale = async () => {
   data.map((order) => {
     order.orderItems.map((item) => {
       if (
-        !products.find((el) => el.product_id === item.product_option.product.id)
+        !products.find((el) => el.productId === item.product_option.product.id)
       ) {
         products.push({
-          product_id: item.product_option.product.id,
+          productId: item.product_option.product.id,
           product_options: [
             {
               product_option_id: item.product_option.id,
@@ -135,7 +135,7 @@ export const top_sale = async () => {
       } else {
         const product = products.at(
           products.findIndex(
-            (el) => el.product_id === item.product_option.product.id
+            (el) => el.productId === item.product_option.product.id
           )
         );
         if (
@@ -179,7 +179,7 @@ export const top_sale = async () => {
       .map(async (e) => {
         const product = await productRepository.findOne({
           where: {
-            id: e.product_id,
+            id: e.productId,
           },
           relations: {
             brand: true,
@@ -213,7 +213,7 @@ export const top_sale = async () => {
         //       sale_number: el.sale_number,
         //       amount: el.amount,
         //       price: opt?.price.price,
-        //       image: opt?.image.image_url
+        //       image: opt?.image.imageUrl
         //     };
         //   })),
         //   rate: product.rate,
@@ -241,7 +241,7 @@ export const top_sale = async () => {
           id: product.id,
           name: product.name,
           rate: product.rate,
-          image: options?.image.image_url,
+          image: options?.image.imageUrl,
           price: options?.price.price,
           brand: product.brand,
           total_sale: e.total_sale,

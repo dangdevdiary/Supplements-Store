@@ -5,5 +5,7 @@ const authApi = {
     return http.post<RegisterResponse>('/user', body);
   },
   loginAccount: (body: { email: string; password: string }) => http.post<ResponseApiLogin>('/auth', body),
+  loginSuccessGG: () => http.get<ResponseApiLogin>('/auth/google/success'),
+  logout: (body: { refreshToken: string }) => http.post('/auth/logout', body),
 };
 export default authApi;

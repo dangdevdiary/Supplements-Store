@@ -1,13 +1,12 @@
 export interface OptionProduct {
-  rom?: string;
-  ram?: string;
-  color?: string;
+  flavor?: string;
+  weigth?: string;
   price?: string;
   product_option_id?: number;
   quantity?: number;
   image?: {
     id: string;
-    image_url: string;
+    imageUrl: string;
     type: string;
   };
   index?: number;

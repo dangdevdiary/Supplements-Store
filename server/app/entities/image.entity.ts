@@ -28,14 +28,14 @@ export class Image {
   type!: EnumTypeImage;
 
   @Column()
-  image_url!: string;
+  imageUrl!: string;
 
   @OneToOne(() => User, (user) => user.avatar, {
     nullable: true,
     onDelete: "CASCADE",
   })
   @JoinColumn({
-    name: "user_id",
+    name: "userId",
   })
   user!: User;
 
@@ -44,7 +44,7 @@ export class Image {
     onDelete: "CASCADE",
   })
   @JoinColumn({
-    name: "product_id",
+    name: "productId",
   })
   product!: Product;
 }

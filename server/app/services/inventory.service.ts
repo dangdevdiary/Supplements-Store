@@ -167,7 +167,7 @@ export const getInboundNote = async (id: number) => {
             flavor: e.product_option.flavor,
             weihth: e.product_option.weigth,
 
-            image: e.product_option.image.image_url,
+            image: e.product_option.image.imageUrl,
           };
         }),
       }

@@ -21,14 +21,14 @@ const CouponModal = ({ refetch, openModal }: { refetch: any; openModal: any }) =
   const [value, setValue] = useState(0);
 
   const create = async () => {
-    const start_date = new Date(date.startDate);
-    const end_date = new Date(date.endDate);
+    const startDate = new Date(date.startDate);
+    const endDate = new Date(date.endDate);
     await couponApi.createCoupon(
       number,
       value,
       type,
-      `${start_date.getMonth() + 1}/${start_date.getDate()}/${start_date.getFullYear()}`,
-      `${end_date.getMonth() + 1}/${end_date.getDate()}/${end_date.getFullYear()}`
+      `${startDate.getMonth() + 1}/${startDate.getDate()}/${startDate.getFullYear()}`,
+      `${endDate.getMonth() + 1}/${endDate.getDate()}/${endDate.getFullYear()}`
     );
     toast.success('create coupon success');
     openModal(false);
@@ -281,7 +281,7 @@ export default function ManageCoupon() {
                                 | ReactPortal
                                 | null
                                 | undefined;
-                              start_date:
+                              startDate:
                                 | string
                                 | number
                                 | boolean
@@ -290,7 +290,7 @@ export default function ManageCoupon() {
                                 | ReactPortal
                                 | null
                                 | undefined;
-                              end_date:
+                              endDate:
                                 | string
                                 | number
                                 | boolean
@@ -311,8 +311,8 @@ export default function ManageCoupon() {
                                 <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.type}</td>
                                 <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.value}</td>
                                 <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.number}</td>
-                                <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.start_date}</td>
-                                <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.end_date}</td>
+                                <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.startDate}</td>
+                                <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.endDate}</td>
                                 <td className='whitespace-nowrap px-6 py-4 text-center text-sm font-medium'>
                                   <button
                                     className='text-red-500 hover:text-red-700'

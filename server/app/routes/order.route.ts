@@ -29,7 +29,7 @@ export const OrderRoutes = (app: Express) => {
     order.getAllOrder
   );
   router.get(
-    /^\/get_all_by_user(\?)?(((limit=[0-9]+)|(page=[0-9]+)|(user_id=[0-9]+))?(\%26)?){3}$/,
+    /^\/get_all_by_user(\?)?(((limit=[0-9]+)|(page=[0-9]+)|(userId=[0-9]+))?(\%26)?){3}$/,
     [authMiddleware.verifyToken()],
     order.getAllOrderByUser
   );

@@ -11,5 +11,7 @@ const path = {
   checkout: '/checkout',
   myOrders: '/myOrders',
   forgotPassword: '/forgot-password',
+  loginGGSucess: '/login/google/success',
+  loginGGFail: '/login/google/fail',
 };
 export default path;

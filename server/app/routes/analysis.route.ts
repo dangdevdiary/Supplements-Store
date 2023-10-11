@@ -12,17 +12,17 @@ export const AnalysisRoutes = (app: Express) => {
 
   router.get(
     "/brand",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     brand.countProduct
   );
   router.get(
     /^\/product_in_warehouse(\?)?(((limit=[0-9])|(page=[0-9])|query=\\w+)?(\%26)?){2}$/,
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     inventory.analysis
   );
   router.get(
     "/top_sale",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     order.top_sale
   );
 
@@ -32,7 +32,7 @@ export const AnalysisRoutes = (app: Express) => {
   router.get("/sales", analysis.analysisSale);
   router.post("/report_revenue", analysis.reportRevenue);
   router.post("/report_inventory", analysis.reportInventory);
-  router.get("/tracking_product/:product_id", analysis.productTracking);
+  router.get("/tracking_product/:productId", analysis.productTracking);
 
   app.use("/api/analysis", router);
 };

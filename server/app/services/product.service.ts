@@ -6,21 +6,24 @@ import { Price } from "../entities/price.entity";
 import { Product } from "../entities/product.entity";
 import { ProductOption } from "../entities/productOption.entity";
 import { Warehouse } from "../entities/warehouse.entity";
-import { BadRequestError } from "../utils/error";
+import { BadRequestError, catchError } from "../utils/error";
 import { failed, success } from "../utils/response";
 import { ProductOptionInterface } from "./productOption.service";
 import { EnumWorkQueueType, WorkQueue } from "../entities/workQueue.entity";
 import { PriceHistory } from "../entities/priceHistoty.entity";
-
+import createHttpError from "http-errors";
+import moment from "moment";
 interface ProductInterface {
   name: string;
   description: string;
+  expirationDate?: string;
+  productionDate?: string;
 }
 
 export const productRepository = AppDataSource.getRepository(Product);
 
 interface FilterProduct {
-  brand_id: number | undefined;
+  brandId: number | undefined;
   price: {
     min: number | undefined;
     max: number | undefined;
@@ -54,7 +57,7 @@ export const getAll = async (
           ? ILike(`%${search}%`)
           : undefined,
       brand: {
-        id: filter?.brand_id ? filter.brand_id : undefined,
+        id: filter?.brandId ? filter.brandId : undefined,
       },
       productOptions: {
         price: {
@@ -91,6 +94,8 @@ export const getAll = async (
           return {
             id: e.id,
             name: e.name,
+            expirationDate: e.expirationDate,
+            productionDate: e.productionDate,
             description: e.description,
             images: e.images.find((e) => e.type === EnumTypeImage.thumbnail),
             brand: e.brand.name,
@@ -110,148 +115,180 @@ export const getAll = async (
 export const create = async (
   product: ProductInterface,
   options: ProductOptionInterface,
-  image_path: string,
-  brand_id: number
+  imagePath: string,
+  brandId: number
 ) => {
-  const { name: name, description: description } = product;
-  const brandRepo = AppDataSource.getRepository(Brand);
-  const brand = await brandRepo.findOneBy({ id: brand_id });
-  if (!brand) return BadRequestError("brand not found");
-  if (name) {
-    const productExists = await productRepository.findOneBy({ name });
-    if (productExists) return BadRequestError("product name already exists");
-    const productObj = productRepository.create({ name, description, brand });
-    const newProduct = await productRepository.save(productObj);
+  try {
+    const {
+      name: name,
+      description: description,
+      expirationDate,
+      productionDate,
+    } = product;
+    const brandRepo = AppDataSource.getRepository(Brand);
+    const brand = await brandRepo.findOneBy({ id: brandId });
+    if (!brand) return createHttpError.BadRequest("brand not found!");
+    if (!expirationDate || !productionDate)
+      return createHttpError.BadRequest(
+        "You must be enter the expirationDate and productionDate"
+      );
+    const convertExd = moment.utc(expirationDate).format("YYYY-MM-DD");
+    const convertPrd = moment.utc(productionDate).format("YYYY-MM-DD");
+    if (name) {
+      const productExists = await productRepository.findOneBy({ name });
+      if (productExists)
+        return createHttpError.BadRequest("product name already exists");
+      const productObj = productRepository.create({
+        name,
+        description,
+        brand,
+        expirationDate: convertExd,
+        productionDate: convertPrd,
+      });
+      const newProduct = await productRepository.save(productObj);
 
-    const productOptionRepository = AppDataSource.getRepository(ProductOption);
-    const { weigth, flavor, price } = options;
+      const productOptionRepository =
+        AppDataSource.getRepository(ProductOption);
+      const { weigth, flavor, price } = options;
 
-    // price
-    const priceRepo = AppDataSource.getRepository(Price);
-    const tempPrice = price
-      ? priceRepo.create({
-          price: price,
-        })
-      : priceRepo.create({
-          price: 1_000_000,
-        });
-    const newPrice = await priceRepo.save(tempPrice);
-    const priceHistoryRepo = AppDataSource.getRepository(PriceHistory);
-    await priceHistoryRepo.save(
-      priceHistoryRepo.create({
-        old_price: price,
-        new_price: price,
-        price: newPrice,
-      })
-    );
-
-    // init warehouse stock
-    const warehouseRepo = AppDataSource.getRepository(Warehouse);
-    const newWarehouse = await warehouseRepo.save(
-      warehouseRepo.create({ quantity: 1 })
-    );
-
-    const imageRepo = AppDataSource.getRepository(Image);
-    const tempImage = imageRepo.create({
-      image_url: image_path,
-      product: newProduct,
-      type: EnumTypeImage.thumbnail,
-    });
-    const newImage = await imageRepo.save(tempImage);
-    const image_opt = await imageRepo.save(
-      imageRepo.create({
-        image_url: image_path,
-        product: newProduct,
-        type: EnumTypeImage.options,
-      })
-    );
-    const opt =
-      weigth && flavor
-        ? productOptionRepository.create({
-            weigth,
-            flavor,
-            product: newProduct,
-            price: newPrice,
-            warehouse: newWarehouse,
-            image: image_opt,
+      // price
+      const priceRepo = AppDataSource.getRepository(Price);
+      const tempPrice = price
+        ? priceRepo.create({
+            price: price,
           })
-        : productOptionRepository.create({
-            flavor: "none",
-            weigth: "1kg",
-            product: newProduct,
-            price: newPrice,
-            warehouse: newWarehouse,
-            image: image_opt,
+        : priceRepo.create({
+            price: 1_000_000,
           });
+      const newPrice = await priceRepo.save(tempPrice);
+      const priceHistoryRepo = AppDataSource.getRepository(PriceHistory);
+      await priceHistoryRepo.save(
+        priceHistoryRepo.create({
+          old_price: price,
+          new_price: price,
+          price: newPrice,
+        })
+      );
 
-    const newOtp = await productOptionRepository.save(opt);
+      // init warehouse stock
+      const warehouseRepo = AppDataSource.getRepository(Warehouse);
+      const newWarehouse = await warehouseRepo.save(
+        warehouseRepo.create({ quantity: 1 })
+      );
 
-    return {
-      new_product: newProduct,
-      new_options: newOtp,
-      new_image: newImage,
-    };
+      const imageRepo = AppDataSource.getRepository(Image);
+      const tempImage = imageRepo.create({
+        imageUrl: imagePath,
+        product: newProduct,
+        type: EnumTypeImage.thumbnail,
+      });
+      const newImage = await imageRepo.save(tempImage);
+      const image_opt = await imageRepo.save(
+        imageRepo.create({
+          imageUrl: imagePath,
+          product: newProduct,
+          type: EnumTypeImage.options,
+        })
+      );
+      const opt =
+        weigth && flavor
+          ? productOptionRepository.create({
+              weigth,
+              flavor,
+              product: newProduct,
+              price: newPrice,
+              warehouse: newWarehouse,
+              image: image_opt,
+            })
+          : productOptionRepository.create({
+              flavor: "none",
+              weigth: "1kg",
+              product: newProduct,
+              price: newPrice,
+              warehouse: newWarehouse,
+              image: image_opt,
+            });
+
+      const newOtp = await productOptionRepository.save(opt);
+
+      return {
+        newProduct: newProduct,
+        newOptions: newOtp,
+        newImage: newImage,
+      };
+    }
+    return createHttpError.BadRequest("missing information!");
+  } catch (error) {
+    if (error instanceof Error)
+      return createHttpError.InternalServerError(error.message);
+    else
+      return createHttpError.InternalServerError(
+        "something went wrong when create product"
+      );
   }
-  return BadRequestError("missing information!");
 };
 
 export const getOneById = async (id: number) => {
-  const product = await productRepository.findOne({
-    where: {
-      id,
-    },
-    relations: {
-      brand: true,
-      specifications: true,
-      images: true,
-      productOptions: {
-        price: true,
-        warehouse: true,
-        image: true,
+  try {
+    const product = await productRepository.findOne({
+      where: {
+        id,
       },
-      feedbacks: true,
-    },
-  });
-  return product
-    ? {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        createAt: product.createAt,
-        updateAt: product.updateAt,
-        brand: product.brand.name,
-        brand_id: product.brand.id,
-        brand_description: product.brand.description,
-        rate: product.rate,
-        feedback: product.feedbacks.map((e) => {
-          return {
-            ...e,
-          };
-        }),
-        specs: product.specifications.map((e) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          // const { id, ...rest } = e;
-          return { ...e };
-        }),
-        images: product.images.filter((e) => e.type === EnumTypeImage.desc),
-        product_options: product.productOptions.map((e) => {
-          return {
-            product_option_id: e.id,
-            flavor: e.flavor,
-            weigth: e.weigth,
-            price: e.price.price,
-            quantity: e.warehouse.quantity,
-            image: e.image,
-          };
-        }),
-      }
-    : BadRequestError("product not found!");
+      relations: {
+        brand: true,
+        specifications: true,
+        images: true,
+        productOptions: {
+          price: true,
+          warehouse: true,
+          image: true,
+        },
+        feedbacks: true,
+      },
+    });
+    return product
+      ? {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          createAt: product.createAt,
+          updateAt: product.updateAt,
+          brand: product.brand.name,
+          brandId: product.brand.id,
+          brand_description: product.brand.description,
+          rate: product.rate,
+          feedback: product.feedbacks.map((e) => {
+            return {
+              ...e,
+            };
+          }),
+          specs: product.specifications.map((e) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // const { id, ...rest } = e;
+            return { ...e };
+          }),
+          images: product.images.filter((e) => e.type === EnumTypeImage.desc),
+          product_options: product.productOptions.map((e) => {
+            return {
+              product_option_id: e.id,
+              flavor: e.flavor,
+              weigth: e.weigth,
+              price: e.price.price,
+              quantity: e.warehouse.quantity,
+              image: e.image,
+            };
+          }),
+        }
+      : BadRequestError("product not found!");
+  } catch (error) {
+    return catchError(error, "something went wrong when get one product by id");
+  }
 };
 
 export const update = async (
   id: number,
   product: ProductInterface,
-  brand_id = -1
+  brandId = -1
 ) => {
   const _product = await productRepository.findOne({
     where: {
@@ -264,7 +301,7 @@ export const update = async (
   if (!_product) return BadRequestError("product not found!");
   const brandRepo = AppDataSource.getRepository(Brand);
   const brand = await brandRepo.findOneBy({
-    id: brand_id !== -1 ? brand_id : _product.brand.id,
+    id: brandId !== -1 ? brandId : _product.brand.id,
   });
   if (!brand) return BadRequestError("error when retrieve brand");
   // console.log(brand);
@@ -281,9 +318,9 @@ export const deleteOne = async (id: number) => {
     : failed();
 };
 
-export const addImages = async (product_id: number, image: string[]) => {
+export const addImages = async (productId: number, image: string[]) => {
   const imageRepo = AppDataSource.getRepository(Image);
-  const product = await productRepository.findOneBy({ id: product_id });
+  const product = await productRepository.findOneBy({ id: productId });
   if (!product) return BadRequestError("product not found");
   if (!image.length) return BadRequestError("image empty");
   return await Promise.all(
@@ -291,7 +328,7 @@ export const addImages = async (product_id: number, image: string[]) => {
       return imageRepo.save(
         imageRepo.create({
           type: EnumTypeImage.desc,
-          image_url: e,
+          imageUrl: e,
           product: product,
         })
       );
@@ -299,11 +336,11 @@ export const addImages = async (product_id: number, image: string[]) => {
   );
 };
 
-export const canRate = async (product_id: number, userId: number) => {
+export const canRate = async (productId: number, userId: number) => {
   const workRepo = AppDataSource.getRepository(WorkQueue);
   const data = await workRepo.findOneBy({
     product: {
-      id: product_id,
+      id: productId,
     },
     user: {
       id: userId,

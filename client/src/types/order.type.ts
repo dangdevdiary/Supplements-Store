@@ -1,7 +1,7 @@
 import { User } from './user.type';
 
 export interface Order {
-  user_id: number;
+  userId: number;
   items: {
     product_option_id: number;
     quantity: number;
@@ -42,9 +42,8 @@ export interface ResGetAllOrder {
     order_items: {
       product_name: string;
       product_option_id: number;
-      ram: string;
-      rom: string;
-      color: string;
+      flavor: string;
+      weigth: string;
       quantity: number;
       prices: number;
       image: string;
@@ -96,5 +95,5 @@ export interface ResGetOneOrder {
   }[];
 }
 export interface orderQueryConfig {
-  user_id: number;
+  userId: number;
 }

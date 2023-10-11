@@ -23,7 +23,7 @@ export class Token {
     onDelete: "CASCADE",
   })
   @JoinColumn({
-    name: "user_id",
+    name: "userId",
   })
   user!: User;
 }

@@ -18,16 +18,16 @@ interface data_feedback {
 }
 
 export const createFeedback = async (
-  product_id: number,
+  productId: number,
   userId: number,
   rate: number,
   comment: string | null = null
 ) => {
-  const product = await productRepo.findOneBy({ id: product_id });
+  const product = await productRepo.findOneBy({ id: productId });
   const user = await userRepo.findOneBy({ id: userId });
   if (!product) return BadRequestError("product not found");
   if (!user) return BadRequestError("user not found");
-  const can_rate = await canRate(product_id, userId);
+  const can_rate = await canRate(productId, userId);
   if (!can_rate.can_rate || can_rate.is_done)
     return BadRequestError("you cannot rate this product");
   await workQueueServices.markAsDone(product, user, EnumWorkQueueType.RATE);
@@ -39,20 +39,20 @@ export const createFeedback = async (
       user,
     })
   );
-  await syncRate(product_id);
+  await syncRate(productId);
   return rs;
 };
 
 export const updateFeedback = async (
-  product_id: number,
+  productId: number,
   userId: number,
   data: data_feedback
 ) => {
-  const can_rate = await canRate(product_id, userId);
+  const can_rate = await canRate(productId, userId);
   if (can_rate.can_rate && can_rate.is_done) {
     const feedback = await feedbackRepo.findOneBy({
       product: {
-        id: product_id,
+        id: productId,
       },
       user: {
         id: userId,
@@ -65,7 +65,7 @@ export const updateFeedback = async (
       .affected
       ? success()
       : failed();
-    await syncRate(product_id);
+    await syncRate(productId);
     return rs;
   }
   return BadRequestError("you cannot update rate for this product");
@@ -87,10 +87,10 @@ export const deleteFeedback = async (id: number) => {
   return rs;
 };
 
-export const getFeedbackByProduct = async (product_id: number) => {
+export const getFeedbackByProduct = async (productId: number) => {
   const product = await productRepo.findOne({
     where: {
-      id: product_id,
+      id: productId,
     },
     relations: {
       feedbacks: {
@@ -117,11 +117,11 @@ export const getFeedbackByProduct = async (product_id: number) => {
       };
 };
 
-export const syncRate = async (product_id: number) => {
-  const feedbacks = await getFeedbackByProduct(product_id);
+export const syncRate = async (productId: number) => {
+  const feedbacks = await getFeedbackByProduct(productId);
   return (
     await productRepo.update(
-      { id: product_id },
+      { id: productId },
       { rate: isError(feedbacks) ? "0" : `${Number(feedbacks.rate)}` }
     )
   ).affected
@@ -132,13 +132,13 @@ export const syncRate = async (product_id: number) => {
 export const getAllFeedback = async () => {
   const feedback = await feedbackRepo.find({
     order: {
-      id: 'DESC'
+      id: "DESC",
     },
     take: 5,
     relations: {
       user: true,
-      product: true
-    }
+      product: true,
+    },
   });
   return feedback.length ? feedback : [];
-}
+};

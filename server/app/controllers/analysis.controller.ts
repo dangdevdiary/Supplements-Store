@@ -1,26 +1,25 @@
-import * as analysisServices from "../services/analysis.service"
+import * as analysisServices from "../services/analysis.service";
 import { Request, Response } from "express";
 
-
 export const analysOverview = async (req: Request, res: Response) => {
-    return res.json(await analysisServices.analysOverview());
-}
+  return res.json(await analysisServices.analysOverview());
+};
 
 export const analysisSale = async (req: Request, res: Response) => {
-    return res.json(await analysisServices.analysisSale());
-}
+  return res.json(await analysisServices.analysisSale());
+};
 
 export const reportRevenue = async (req: Request, res: Response) => {
-    const { startDate, endDate } = req.body;
-    return res.json(await analysisServices.reportRevenue(startDate, endDate));
-}
+  const { startDate, endDate } = req.body;
+  return res.json(await analysisServices.reportRevenue(startDate, endDate));
+};
 
 export const reportInventory = async (req: Request, res: Response) => {
-    const { startDate, endDate } = req.body;
-    return res.json(await analysisServices.reportInventory(startDate, endDate));
-}
+  const { startDate, endDate } = req.body;
+  return res.json(await analysisServices.reportInventory(startDate, endDate));
+};
 
 export const productTracking = async (req: Request, res: Response) => {
-    const { product_id } = req.params;
-    return res.json(await analysisServices.productAnalysis(Number(product_id)));
-}
+  const { productId } = req.params;
+  return res.json(await analysisServices.productAnalysis(Number(productId)));
+};

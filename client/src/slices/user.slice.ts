@@ -9,11 +9,12 @@ interface UserState {
 
 function init() {
   const token = getAccessToken();
+  console.log('🚀 ~ file: user.slice.ts:12 ~ init ~ token:', token);
   if (token) {
     const user = jwtDecode<{
       firstName: string;
       lastName: string;
-      user_id: number;
+      userId: number;
       iat: string;
       role: string;
     }>(token);
@@ -21,7 +22,7 @@ function init() {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-      id: user.user_id,
+      id: user.userId,
     };
   }
 }

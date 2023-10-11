@@ -1,46 +1,48 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { User } from "./user.entity";
 import { Product } from "./product.entity";
 
 export enum EnumWorkQueueType {
-    NONE,
-    RATE,
-    ORDER
-} 
+  NONE,
+  RATE,
+  ORDER,
+}
 
 @Entity("work_queue")
 export class WorkQueue {
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column({
-        type: 'enum',
-        enum: EnumWorkQueueType
-    })
-    type!: EnumWorkQueueType;
+  @Column({
+    type: "enum",
+    enum: EnumWorkQueueType,
+  })
+  type!: EnumWorkQueueType;
 
-    @Column({
-        type: 'boolean',
-        default: false
-    })
-    is_done!: boolean;
+  @Column({
+    type: "boolean",
+    default: false,
+  })
+  is_done!: boolean;
 
-    @ManyToOne(
-        () => User,
-        user => user.workqueue,
-        {
-            onDelete: "CASCADE"
-        }
-    )
-    @JoinColumn({
-        name: "user_id"
-    })
-    user!: User;
+  @ManyToOne(() => User, (user) => user.workqueue, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({
+    name: "userId",
+  })
+  user!: User;
 
-    @OneToOne(() => Product, { nullable: true })
-    @JoinColumn({
-        name: "product_id",
-    })
-    product!: Product;
-
+  @OneToOne(() => Product, { nullable: true })
+  @JoinColumn({
+    name: "productId",
+  })
+  product!: Product;
 }

@@ -144,12 +144,12 @@ function ProductDetails() {
       const cartItem: CartItem = {
         id: product?.data.id,
         name: product.data.name,
-        image: product.data.images.image_url,
+        image: product.data.images.imageUrl,
         option: {
           price: opt.price,
           product_option_id: opt.product_option_id,
           quantity: quantity as number,
-          image: opt.image?.image_url,
+          image: opt.image?.imageUrl,
           stock: opt.quantity || 0,
         },
       };
@@ -184,7 +184,7 @@ function ProductDetails() {
               <Carousel selectedItem={optionSelected?.index} showThumbs={false} emulateTouch={true}>
                 {product?.data.product_options.map((item, i) => (
                   <div key={i}>
-                    <img className='object-contain' src={`${baseURL}/${item.image?.image_url}`} alt={`${i} Slide`} />
+                    <img className='object-contain' src={`${baseURL}/${item.image?.imageUrl}`} alt={`${i} Slide`} />
                   </div>
                 ))}
               </Carousel>
@@ -195,9 +195,7 @@ function ProductDetails() {
                     <div key={item.product_option_id}>
                       <img
                         className=''
-                        src={`${baseURL}/${
-                          item.image?.image_url ? item.image.image_url : product.data.images.image_url
-                        }`}
+                        src={`${baseURL}/${item.image?.imageUrl ? item.image.imageUrl : product.data.images.imageUrl}`}
                         alt={`${i} Slide`}
                       />
                     </div>
@@ -251,12 +249,9 @@ function ProductDetails() {
                         })}
                         onClick={() => setOptionSelected({ ...op, index })}
                       >
-                        <div className='flex items-center justify-center'>
-                          <span>Ram: {op.ram}</span>
-                          <span className='mx-3'>Rom: {op.rom}</span>
-                          <span>
-                            {t('productdetail.color')}: {op.color}
-                          </span>
+                        <div className='flex items-center justify-around'>
+                          <span className='text-orange-400'>Vị: {op.flavor}</span>
+                          <span className='text-blue-400'>{op.weigth}</span>
                         </div>
                         <div className='flex items-center justify-around'>
                           <span className='text-3xl'>{formatPrice(Number(op.price))}</span>

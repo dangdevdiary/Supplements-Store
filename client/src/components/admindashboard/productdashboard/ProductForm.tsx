@@ -18,7 +18,7 @@ export default function ProductForm() {
     refetchOnWindowFocus: false,
   });
   const [name, setName] = useState('');
-  const [brand_id, setBrandId] = useState(-1);
+  const [brandId, setBrandId] = useState(-1);
   const [image, setImage] = useState<File>();
   const [description, setDesc] = useState('');
   const [ram, setRam] = useState('');
@@ -40,7 +40,7 @@ export default function ProductForm() {
         .then((res) => res.data)
         .then((data) => {
           setName(data.name);
-          setBrandId(data.brand_id !== undefined ? data.brand_id : -1);
+          setBrandId(data.brandId !== undefined ? data.brandId : -1);
           setDesc(data.description);
           setSpecs(data.specs);
         });
@@ -54,7 +54,7 @@ export default function ProductForm() {
     }
     const data = new FormData();
     data.append('name', name);
-    data.append('brand_id', `${brand_id}`);
+    data.append('brandId', `${brandId}`);
     data.append('description', description);
     data.append('ram', ram);
     data.append('rom', rom);
@@ -71,7 +71,7 @@ export default function ProductForm() {
     const response = await productsApi.updateProduct(Number(location.state.id), {
       name,
       description,
-      brand_id,
+      brandId,
     });
 
     if (response.status === 200) toast.success('update product success!');
@@ -112,7 +112,7 @@ export default function ProductForm() {
                     >
                       <option>{t('detailproduct.selectbrand')}</option>
                       {brand.data?.data.map((e: { id: number; name: string }, i) => (
-                        <option key={i.toString()} value={e.id} selected={brand_id === e.id}>
+                        <option key={i.toString()} value={e.id} selected={brandId === e.id}>
                           {e.name}
                         </option>
                       ))}

@@ -12,7 +12,7 @@ function Product({ product }: Props) {
         <div className='relative w-full flex-shrink-0 pt-[100%]'>
           <img
             className='absolute top-0 left-0 h-full w-full object-contain'
-            src={'http://localhost:3000/' + product.images.image_url}
+            src={'http://localhost:3000/' + product.images.imageUrl}
             alt=''
           />
         </div>

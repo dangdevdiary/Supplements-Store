@@ -19,7 +19,7 @@ export const signAccessToken = async (user: ItokenValue): Promise<string> => {
       },
       process.env.JWT_ACCESS_KEY || "dangdevdiary",
       {
-        expiresIn: 2 * 60,
+        expiresIn: "1d",
       },
       (err, token) => {
         if (err || !token) {

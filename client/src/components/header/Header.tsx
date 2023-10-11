@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BsSearch, BsTelephoneForward } from 'react-icons/bs';
 import { GoDiffRenamed } from 'react-icons/go';
 import classNames from 'classnames';
@@ -6,8 +6,7 @@ import { FiSettings } from 'react-icons/fi';
 import { BiLogIn, BiShoppingBag } from 'react-icons/bi';
 import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AppContext } from 'src/contexts/app.context';
-import { clearAccessToken } from 'src/utils/auth';
+import { clearAccessToken, clearRefreshToken, getRefreshToken } from 'src/utils/auth';
 import userApi from 'src/apis/user.api';
 import path from 'src/constants/path';
 import { RiUserSettingsLine } from 'react-icons/ri';
@@ -15,7 +14,7 @@ import Cart from '../popover/CartPopover';
 import useClickOutSide from 'src/hooks/useClickOutSide';
 import { GrUserAdmin } from 'react-icons/gr';
 import { useDispatch, useSelector } from 'react-redux';
-import logo from 'src/assets/logo.svg';
+import logo from 'src/assets/img/logo.png';
 import Language from 'src/components/language/Language';
 import { useTranslation } from 'react-i18next';
 import { MdLanguage } from 'react-icons/md';
@@ -26,13 +25,17 @@ import { ResNoti } from 'src/types/noti.type';
 import { RootState } from 'src/store';
 import { logoutCart } from 'src/slices/cart.slice';
 import { reset } from 'src/slices/user.slice';
+import { setIsAuth } from 'src/slices/auth.slice';
+import authApi from 'src/apis/auth.api';
+import { toast } from 'react-toastify';
+import { isAxiosErr } from 'src/utils/error';
 
 function Header() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuth, setIsAuth } = useContext(AppContext);
+  const isAuth = useSelector((state: RootState) => state.authReducer.isAuth);
   const [showMenuUser, setShowMenuUser] = useState<boolean>(false);
   const [showNotify, setShowNotify] = useState<boolean>(false);
   const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
@@ -89,13 +92,26 @@ function Header() {
       search: `?search=${searchProduct}`,
     });
   };
-  const handleLogout = () => {
-    setIsAuth(false);
-    clearAccessToken();
-    dispatch(logoutCart([]));
-    dispatch(reset());
-    queryClient.removeQueries();
-    navigate('/');
+  const handleLogout = async () => {
+    const reToken = getRefreshToken();
+    console.log('🚀 ~ file: Header.tsx:97 ~ handleLogout ~ reToken:', reToken);
+    if (reToken)
+      await authApi
+        .logout({
+          refreshToken: reToken,
+        })
+        .then(() => {
+          dispatch(setIsAuth(false));
+          clearAccessToken();
+          clearRefreshToken();
+          dispatch(reset());
+          dispatch(logoutCart([]));
+          queryClient.removeQueries();
+          navigate('/');
+        })
+        .catch((err) => {
+          if (isAxiosErr(err)) toast.error(err.message);
+        });
   };
   return (
     <AnimatePresence>

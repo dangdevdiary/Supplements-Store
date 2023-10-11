@@ -3,51 +3,45 @@ import { Order } from "./order.entity";
 import { CouponCondition } from "./couponCondition.entity";
 
 export enum EnumTypeCoupon {
-    SHIP, // coupon about shipping, 100 - free ship, 50 - 50% off ship cost
-    PERCENT, // percent of total order, 20 - reduce order total by 20% 
-    AMOUNT, // fix amount discount off by total order amount, 10000 - reduce order total by 10000 vnd
+  SHIP, // coupon about shipping, 100 - free ship, 50 - 50% off ship cost
+  PERCENT, // percent of total order, 20 - reduce order total by 20%
+  AMOUNT, // fix amount discount off by total order amount, 10000 - reduce order total by 10000 vnd
 }
 
 @Entity("coupons")
 export class Coupon {
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column()
-    code!: string;
+  @Column()
+  code!: string;
 
-    @Column({
-        type: "enum",
-        enum: EnumTypeCoupon
-    })
-    type!: EnumTypeCoupon
+  @Column({
+    type: "enum",
+    enum: EnumTypeCoupon,
+  })
+  type!: EnumTypeCoupon;
 
-    @Column()
-    value!: number;
+  @Column()
+  value!: number;
 
-    @Column()
-    start_date!: string;
+  @Column()
+  startDate!: string;
 
-    @Column()
-    end_date!: string;
+  @Column()
+  endDate!: string;
 
-    @Column({
-        default: true
-    })
-    active!: boolean;
+  @Column({
+    default: true,
+  })
+  active!: boolean;
 
-    @Column()
-    number!: number;
+  @Column()
+  number!: number;
 
-    @OneToMany(
-        () => Order,
-        order => order.coupon
-    )
-    orders!: Order[];
+  @OneToMany(() => Order, (order) => order.coupon)
+  orders!: Order[];
 
-    @OneToMany(
-        () => CouponCondition,
-        couponCondition => couponCondition.coupon
-    )
-    conditions!: CouponCondition[];
+  @OneToMany(() => CouponCondition, (couponCondition) => couponCondition.coupon)
+  conditions!: CouponCondition[];
 }

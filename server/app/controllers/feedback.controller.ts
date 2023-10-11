@@ -2,19 +2,20 @@ import * as feedbackServices from "../services/feedback.service";
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError, isError } from "../utils/error";
 import err from "../middlewares/error";
+import { User } from "../utils/user";
 
 export const createFeedback = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { user_id, product_id, rate, comment } = req.body;
-  if (!user_id || !product_id)
+  const { userId, productId, rate, comment } = req.body;
+  if (!userId || !productId)
     return next(err(BadRequestError("product or user id not found"), res));
   if (!rate) return next(err(BadRequestError("rate cannot empty"), res));
   const rs = await feedbackServices.createFeedback(
-    Number(product_id),
-    Number(user_id),
+    Number(productId),
+    Number(userId),
     Number(rate),
     comment && comment
   );
@@ -26,11 +27,11 @@ export const updateFeedback = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { product_id } = req.params;
+  const { productId } = req.params;
   const { rate, comment } = req.body;
   const rs = await feedbackServices.updateFeedback(
-    Number(product_id),
-    Number(req.user?.userId),
+    Number(productId),
+    Number((req.user as User).userId),
     { rate, comment }
   );
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
@@ -51,8 +52,8 @@ export const getFeedbackByProduct = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { product_id } = req.params;
-  const rs = await feedbackServices.getFeedbackByProduct(Number(product_id));
+  const { productId } = req.params;
+  const rs = await feedbackServices.getFeedbackByProduct(Number(productId));
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };
 

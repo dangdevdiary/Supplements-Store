@@ -189,11 +189,11 @@ export default function DetailProduct() {
     price: '',
     product_option_id: 0,
   });
-  const { product_id } = useParams();
+  const { productId } = useParams();
   const navigate = useNavigate();
-  if (product_id === undefined || !Number(product_id)) navigate('/admin/product');
+  if (productId === undefined || !Number(productId)) navigate('/admin/product');
   const { data, refetch } = useQuery(['get_product_details'], () =>
-    productsApi.getProductDetail(product_id !== undefined ? product_id : '1')
+    productsApi.getProductDetail(productId !== undefined ? productId : '1')
   );
   const product = data?.data;
   const product_options = product?.product_options ? product.product_options : [];
@@ -276,7 +276,7 @@ export default function DetailProduct() {
                             <td className='px-6 py-4'>
                               <img
                                 className='w-26 h-28 text-left'
-                                src={`${baseURL}/${e.image?.image_url !== undefined ? e.image?.image_url : ''}`}
+                                src={`${baseURL}/${e.image?.imageUrl !== undefined ? e.image?.imageUrl : ''}`}
                                 alt={`product_image`}
                               />
                             </td>

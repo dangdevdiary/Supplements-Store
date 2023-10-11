@@ -27,6 +27,8 @@ import Discount from './components/discount';
 import TopProducts from './components/topsale';
 import { useEffect } from 'react';
 import ForgotPassword from './pages/forgotpassword';
+import LoginGGSuccess from './pages/login/LoginGoogle/LoginGGSuccess';
+import LoginGGFail from './pages/login/LoginGoogle/LoginGGFail';
 function App() {
   useEffect(() => {
     localStorage.theme = 'light';
@@ -47,6 +49,7 @@ function App() {
             </MainLayout>
           }
         />
+
         <Route
           path={path.forgotPassword}
           element={
@@ -55,6 +58,7 @@ function App() {
             </MainLayout>
           }
         />
+
         <Route path='' element={<ProtectedRoute />}>
           <Route
             path={path.checkout}
@@ -81,6 +85,7 @@ function App() {
               </Profile>
             }
           ></Route>
+          
           <Route
             path={path.cart}
             element={
@@ -97,6 +102,24 @@ function App() {
             element={
               <AuthLayout>
                 <Login />
+              </AuthLayout>
+            }
+          />
+
+          <Route
+            path={path.loginGGFail}
+            element={
+              <AuthLayout>
+                <LoginGGFail />
+              </AuthLayout>
+            }
+          />
+
+          <Route
+            path={path.loginGGSucess}
+            element={
+              <AuthLayout>
+                <LoginGGSuccess />
               </AuthLayout>
             }
           />

@@ -3,7 +3,7 @@ import { AppDataSource } from "../database";
 import { Coupon, EnumTypeCoupon } from "../entities/coupon.entity";
 import { EnumStatusOrder, Order } from "../entities/order.entity";
 import { Payment } from "../entities/payment.entity";
-import { BadRequestError, isError } from "../utils/error";
+import { BadRequestError, catchError, isError } from "../utils/error";
 import { failed, success } from "../utils/response";
 // import { CouponCondition } from "../entities/couponCondition.entity";
 
@@ -20,8 +20,8 @@ const generateCode = (length: number) => {
 };
 
 interface exprire {
-  start_date: string;
-  end_date: string;
+  startDate: string;
+  endDate: string;
 }
 
 interface coupon extends exprire {
@@ -44,32 +44,36 @@ export const createNew = async (
   expired: exprire,
   type: EnumTypeCoupon
 ) => {
-  const coupons: coupon[] = [];
-  for (let i = 0; i < duplicate; i++) {
-    const code = generateCode(length);
-    coupons.push({
-      code,
-      type: Number(EnumTypeCoupon[type]),
-      value,
-      number,
-      ...expired,
-    });
-  }
-
-  const result: Coupon[] = [];
-  await Promise.all(
-    coupons.map(async (coupon) => {
-      result.push({
-        ...(await couponRepo.save(
-          couponRepo.create({
-            ...coupon,
-          })
-        )),
+  try {
+    const coupons: coupon[] = [];
+    for (let i = 0; i < duplicate; i++) {
+      const code = generateCode(length);
+      coupons.push({
+        code,
+        type: Number(EnumTypeCoupon[type]),
+        value,
+        number,
+        ...expired,
       });
-    })
-  );
+    }
 
-  return result;
+    const result: Coupon[] = [];
+    await Promise.all(
+      coupons.map(async (coupon) => {
+        result.push({
+          ...(await couponRepo.save(
+            couponRepo.create({
+              ...coupon,
+            })
+          )),
+        });
+      })
+    );
+
+    return result;
+  } catch (error) {
+    return catchError(error, "something went wrong when create new coupon");
+  }
 };
 
 const checkCoupon = async (code: string) => {
@@ -82,10 +86,10 @@ const checkCoupon = async (code: string) => {
   if (!coupon) return BadRequestError("coupon not found", 404);
   if (!coupon.active) return BadRequestError("coupon not active");
   if (!coupon.number) return BadRequestError("coupon out of quantity");
-  const start_date = new Date(coupon.start_date).getTime();
-  const end_date = new Date(coupon.end_date).getTime();
+  const startDate = new Date(coupon.startDate).getTime();
+  const endDate = new Date(coupon.endDate).getTime();
   const now = new Date().getTime();
-  if (start_date > now || end_date < now)
+  if (startDate > now || endDate < now)
     return BadRequestError("you cannot apply coupon now");
 
   return coupon;
@@ -247,23 +251,25 @@ export const getAllCoupon = async () => {
     })
   )
     .filter((coupon) => {
-      const start_date = new Date(coupon.start_date).getTime();
-      const end_date = new Date(coupon.end_date).getTime();
+      const startDate = new Date(coupon.startDate).getTime();
+      const endDate = new Date(coupon.endDate).getTime();
       const now = new Date().getTime();
-      return start_date > now || end_date < now ? false : true;
+      return startDate > now || endDate < now ? false : true;
     })
     .map((e) => {
-      const start_d = e.start_date.split("/");
-      const end_d = e.end_date.split("/");
+      const start_d = e.startDate.split("/");
+      const end_d = e.endDate.split("/");
       return {
         ...e,
         type: EnumTypeCoupon[e.type],
-        start_date: `${start_d[1]}/${start_d[0]}/${start_d[2]}`,
-        end_date: `${end_d[1]}/${end_d[0]}/${end_d[2]}`,
+        startDate: `${start_d[1]}/${start_d[0]}/${start_d[2]}`,
+        endDate: `${end_d[1]}/${end_d[0]}/${end_d[2]}`,
       };
     });
 };
 
 export const deleteCoupon = async (coupon_id: number) => {
-  return (await couponRepo.delete({ id : coupon_id })).affected ? success() : failed()
-}
+  return (await couponRepo.delete({ id: coupon_id })).affected
+    ? success()
+    : failed();
+};

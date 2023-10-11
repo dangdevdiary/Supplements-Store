@@ -57,7 +57,7 @@ export const UserRoutes = (app: Express) => {
   );
   router.delete(
     "/:id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     user.deleteOne
   );
   router.delete(

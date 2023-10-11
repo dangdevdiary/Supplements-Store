@@ -12,10 +12,10 @@ export interface SpecificationInterface {
 }
 
 export const create = async (
-  product_id: number,
+  productId: number,
   spec: SpecificationInterface[]
 ) => {
-  const product = await productRepository.findOneBy({ id: product_id });
+  const product = await productRepository.findOneBy({ id: productId });
   if (!product) return BadRequestError("product not found");
   const new_specs: Specification[] = [];
   if (spec.length) {

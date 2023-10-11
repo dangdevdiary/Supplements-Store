@@ -40,7 +40,7 @@ function MyOrder() {
     queryKey: ['ordersOfUser'],
     queryFn: () =>
       orderApi.getOrdersOfUser({
-        user_id: userId || -1,
+        userId: userId || -1,
       }),
     enabled: Boolean(userId),
     refetchOnWindowFocus: false,
@@ -230,14 +230,9 @@ function MyOrder() {
                         <div className='flex items-center'>
                           <span className='hidden pr-2 lg:inline-block'>{t('myorder.classification')}: </span>
                           <div className='uppercase'>
-                            <span className='border border-slate-300 px-1 text-xs md:text-sm'>
-                              ram: {orderItem.ram}
-                            </span>
+                            <span className='border border-slate-300 px-1 text-xs md:text-sm'>{orderItem.flavor}</span>
                             <span className='hidden border border-slate-300 px-1 md:inline-block'>
-                              rom: {orderItem.rom}
-                            </span>
-                            <span className='border border-slate-300 px-1 text-xs md:text-sm'>
-                              {t('myorder.color')}: {orderItem.color}
+                              {orderItem.weigth}
                             </span>
                           </div>
                         </div>

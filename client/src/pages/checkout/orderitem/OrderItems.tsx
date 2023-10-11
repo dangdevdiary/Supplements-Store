@@ -5,16 +5,15 @@ interface Props {
   orderItem: {
     product_name: string;
     product_option_id: number;
-    ram: string;
-    rom: string;
-    color: string;
+    flavor: string;
+    weigth: string;
     quantity: number;
     image: string;
     prices: number;
   };
 }
 function OrderItem({ orderItem }: Props) {
-  const { t } = useTranslation('myorder');
+  // const { t } = useTranslation('myorder');
   return (
     <div className='flex w-full items-center border-b p-2'>
       <div className='flex-shrink-0'>
@@ -25,14 +24,12 @@ function OrderItem({ orderItem }: Props) {
         <div className='flex w-full items-center justify-start'>
           <div className='flex-grow'>
             <span className='border-r pr-2 text-sm font-medium text-slate-400'>
-              RAM: <i>{orderItem.ram}</i>
+              Vị: <i>{orderItem.flavor}</i>
             </span>
             <span className='border-r px-2 text-sm font-medium text-slate-400'>
-              ROM: <i>{orderItem.rom}</i>
+              <i>{orderItem.weigth}</i>
             </span>
-            <span className='border-r px-2 text-sm font-medium text-slate-400'>
-              {t('myorder.color')}: <i>{orderItem.color}</i>
-            </span>
+
             <div className='inline-block'>
               <span className='flex-shrink text-base font-semibold text-orange-400'>
                 {formatPrice(orderItem.prices)}

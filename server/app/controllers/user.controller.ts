@@ -8,6 +8,7 @@ import {
   signRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt";
+import { User } from "../utils/user";
 export const getAll = async (
   req: Request,
   res: Response,
@@ -67,8 +68,8 @@ export const getOne = async (
   next: NextFunction
 ) => {
   try {
-    const user_id = Number(req.params.id);
-    const rs = await userServices.getOne(user_id);
+    const userId = Number(req.params.id);
+    const rs = await userServices.getOne(userId);
     return isError(rs) ? next(err(rs, res)) : res.json(rs);
   } catch (error) {
     next(error);
@@ -164,7 +165,7 @@ export const changePassword = async (
   const { old_password, new_password } = req.body;
   if (!req.user) return next(err(BadRequestError("error"), res));
   const rs = await userServices.changePassword(
-    req.user?.userId,
+    (req.user as User)?.userId,
     old_password,
     new_password
   );

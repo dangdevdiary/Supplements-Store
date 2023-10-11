@@ -136,7 +136,7 @@ function CartUser() {
     if (checkedItems.length <= 0) toast.error('Vui lòng chọn sản phẩm cần mua', { autoClose: 2000 });
     if (userId && checkedItems.length > 0) {
       const order: Order = {
-        user_id: userId,
+        userId: userId,
         items: checkedItems.map((it) => {
           return {
             product_option_id: it.option.product_option_id,

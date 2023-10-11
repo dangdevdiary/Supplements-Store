@@ -6,18 +6,18 @@ export const specificationRoutes = (app: Express) => {
   const router = express.Router();
 
   router.post(
-    "/:product_id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    "/:productId",
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     specification.create
   );
   router.delete(
     "/:id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     specification.deleteOne
   );
   router.put(
     "/:id",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     specification.updateOne
   );
 

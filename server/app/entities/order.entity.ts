@@ -50,7 +50,7 @@ export class Order {
     onDelete: "CASCADE",
   })
   @JoinColumn({
-    name: "user_id",
+    name: "userId",
   })
   user!: User;
 

@@ -60,7 +60,7 @@ function Checkout() {
     totalQuantity: 0,
   });
   const [address, setAddress] = useState<{
-    user_id?: number;
+    userId?: number;
     id: number;
     content: string;
   }>({

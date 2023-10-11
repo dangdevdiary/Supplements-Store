@@ -197,7 +197,7 @@ export const getOneOrder = async (order_id: number) => {
         weigth: e.product_option.weigth,
         price: e.product_option.price,
         quantity: e.quantity,
-        image: e.product_option.image.image_url,
+        image: e.product_option.image.imageUrl,
         prices: e.price,
       };
     }),
@@ -364,7 +364,7 @@ export const getAllOrderByUser = async (
                 price: el.product_option.price,
                 quantity: el.quantity,
                 prices: el.price,
-                image: el.product_option.image.image_url,
+                image: el.product_option.image.imageUrl,
               };
             }),
             payment: {

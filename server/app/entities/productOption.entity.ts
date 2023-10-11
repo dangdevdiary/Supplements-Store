@@ -28,7 +28,7 @@ export class ProductOption {
     onDelete: "CASCADE",
   })
   @JoinColumn({
-    name: "product_id",
+    name: "productId",
   })
   product!: Product;
 

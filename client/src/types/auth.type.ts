@@ -10,6 +10,6 @@ export type RegisterResponse = ResponseApi<User>;
 export interface ResponseApiLogin {
   message?: string;
   token?: string;
-  statusCode?: number;
-  error?: string;
+  refreshToken?: string;
+  status?: string;
 }

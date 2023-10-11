@@ -56,13 +56,13 @@ function AsignFilter({ queryConfig, brands }: Props) {
               <li
                 key={brand.id}
                 className={classNames('cursor-pointer p-2 text-sm text-gray-700 duration-200 hover:text-orange-500', {
-                  'text-orange-500': String(brand.id) === queryConfig.brand_id,
+                  'text-orange-500': String(brand.id) === queryConfig.brandId,
                 })}
               >
                 <Link
                   to={{
                     pathname: path.home,
-                    search: createSearchParams({ ...queryConfig, brand_id: brand.id.toString() }).toString(),
+                    search: createSearchParams({ ...queryConfig, brandId: brand.id.toString() }).toString(),
                   }}
                 >
                   {brand.name}

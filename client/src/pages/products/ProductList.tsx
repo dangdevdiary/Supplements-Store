@@ -20,7 +20,7 @@ function ProductList() {
   const queryParams: ProductListConfig = {
     page: query.page ? query.page : '1',
     limit: query.limit ? query.limit : '10',
-    brand_id: query.brand_id,
+    brandId: query.brandId,
     price_min: query.price_min,
     price_max: query.price_max,
     rate: query.rate ? query.rate : '0',

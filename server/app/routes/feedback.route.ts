@@ -11,7 +11,7 @@ export const feedbackRoutes = (app: Express) => {
     feedback.createFeedback
   );
   router.put(
-    "/update/:product_id",
+    "/update/:productId",
     [authMiddleware.verifyToken()],
     feedback.updateFeedback
   );
@@ -20,10 +20,10 @@ export const feedbackRoutes = (app: Express) => {
     [authMiddleware.verifyToken()],
     feedback.deleteFeedback
   );
-  router.get("/get_by_product/:product_id", feedback.getFeedbackByProduct);
+  router.get("/get_by_product/:productId", feedback.getFeedbackByProduct);
   router.get(
     "/get_all",
-    [authMiddleware.verifyToken(), authMiddleware.require_admin()],
+    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
     feedback.getAllFeedback
   );
 

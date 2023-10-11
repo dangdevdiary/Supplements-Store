@@ -19,6 +19,11 @@ export enum UserRole {
   MEMBER = "member",
 }
 
+export enum EGender {
+  MALE = "nam",
+  FEMALE = "nu",
+}
+
 @Entity("users")
 export class User {
   @PrimaryGeneratedColumn()
@@ -66,6 +71,13 @@ export class User {
     default: UserRole.MEMBER,
   })
   role!: UserRole;
+
+  @Column({
+    type: "enum",
+    enum: EGender,
+    default: EGender.MALE,
+  })
+  gender!: EGender;
 
   @CreateDateColumn()
   createAt!: Date;
