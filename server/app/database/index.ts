@@ -23,6 +23,7 @@ import { Address } from "../entities/address.entity";
 import { Notification } from "../entities/notification.entity";
 import { WorkQueue } from "../entities/workQueue.entity";
 import { Token } from "../entities/token.entity";
+import { Category } from "../entities/category.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -58,6 +59,7 @@ export const AppDataSource = new DataSource({
     Notification,
     WorkQueue,
     Token,
+    Category,
   ],
   migrations: ["app/migrations/**/*.ts"],
   subscribers: [],

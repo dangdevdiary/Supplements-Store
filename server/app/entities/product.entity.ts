@@ -13,6 +13,7 @@ import { Specification } from "./specification.entity";
 import { Image } from "./image.entity";
 import { ProductOption } from "./productOption.entity";
 import { Feedback } from "./feedback.entity";
+import { Category } from "./category.entity";
 
 @Entity("products")
 export class Product {
@@ -66,6 +67,11 @@ export class Product {
   @OneToMany(() => Feedback, (feedback) => feedback.product)
   feedbacks!: Feedback[];
 
+  @ManyToOne(() => Category, (category) => category.product)
+  @JoinColumn({
+    name: "cateId",
+  })
+  category!: Category;
   @Column({
     default: "0",
   })
