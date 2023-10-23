@@ -94,7 +94,6 @@ function Header() {
   };
   const handleLogout = async () => {
     const reToken = getRefreshToken();
-    console.log('🚀 ~ file: Header.tsx:97 ~ handleLogout ~ reToken:', reToken);
     if (reToken)
       await authApi
         .logout({

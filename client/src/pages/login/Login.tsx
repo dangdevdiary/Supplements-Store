@@ -66,7 +66,7 @@ function Login() {
         {/* login section */}
         <div className='row-span-2 p-4 md:col-span-2'>
           <div className='text-left font-bold'>
-            <span className='text-sm text-form'>Fstore</span>
+            <span className='text-sm text-form'>Wheystore</span>
           </div>
           <div className='py-10'>
             <h2 className='mb-2 text-3xl font-bold text-form'>{t('login.login account')}</h2>

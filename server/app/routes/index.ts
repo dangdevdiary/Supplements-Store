@@ -10,6 +10,7 @@ import { NotifyRoutes } from "./notification.route";
 import { feedbackRoutes } from "./feedback.route";
 import { AnalysisRoutes } from "./analysis.route";
 import { CouponRoutes } from "./coupon.route";
+import { CategoryRoutes } from "./category.route";
 
 export const Routes = [
   UserRoutes,
@@ -24,4 +25,5 @@ export const Routes = [
   feedbackRoutes,
   AnalysisRoutes,
   CouponRoutes,
+  CategoryRoutes,
 ];

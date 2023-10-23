@@ -211,7 +211,6 @@ export const sendRefreshToken = async (
     const { refreshToken } = req.body;
     if (!refreshToken) throw createError.NotFound("refresh token not found!");
     const payload = await verifyRefreshToken(refreshToken);
-    console.log(payload);
     if (!payload) throw createError.BadRequest("token is not valid");
     const accessToken = await signAccessToken(payload);
     const newRefreshToken = await signRefreshToken(payload);

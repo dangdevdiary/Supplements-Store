@@ -13,7 +13,9 @@ class Http {
     });
     this.instance.interceptors.request.use((config) => {
       if (!this.token) this.token = getAccessToken();
+      console.log('🚀 ~ file: http.ts:16 ~ Http ~ this.instance.interceptors.request.use ~ this.token:', this.token);
       config.withCredentials = true;
+
       config.headers['Authorization'] = 'bearer ' + this.token;
       return config;
     });

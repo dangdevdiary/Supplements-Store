@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import classNames from 'classnames';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { GrFilter } from 'react-icons/gr';
@@ -10,6 +11,7 @@ import path from 'src/constants/path';
 import { Brand } from 'src/types/brand.type';
 import { ProductListConfig } from 'src/types/product.type';
 import { type FilterPriceSchema, filterPriceSchema } from 'src/utils/rulesValidateForm';
+import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
 
 interface Props {
   queryConfig: {
@@ -20,6 +22,13 @@ interface Props {
 
 function AsignFilter({ queryConfig, brands }: Props) {
   const { t } = useTranslation('asignfilter');
+  const [isLoadMoreBrand, setIsLoadMoreBrand] = useState<{
+    isLoadMore: boolean;
+    lengthBrands: number;
+  }>({
+    isLoadMore: false,
+    lengthBrands: 5,
+  });
   const navigate = useNavigate();
   const { register, handleSubmit, reset } = useForm<FilterPriceSchema>({
     resolver: yupResolver(filterPriceSchema),
@@ -52,25 +61,64 @@ function AsignFilter({ queryConfig, brands }: Props) {
         <p className='text-base text-black'>{t('asignfilter.producer')}</p>
         <ul>
           {brands.length >= 0 &&
-            brands.map((brand) => (
-              <li
-                key={brand.id}
-                className={classNames('cursor-pointer p-2 text-sm text-gray-700 duration-200 hover:text-orange-500', {
-                  'text-orange-500': String(brand.id) === queryConfig.brandId,
-                })}
-              >
-                <Link
-                  to={{
-                    pathname: path.home,
-                    search: createSearchParams({ ...queryConfig, brandId: brand.id.toString() }).toString(),
-                  }}
-                >
-                  {brand.name}
-                </Link>
-              </li>
-            ))}
+            brands.map((brand, index) => {
+              if (index < isLoadMoreBrand.lengthBrands)
+                return (
+                  <li
+                    key={brand.id}
+                    className={classNames(
+                      'cursor-pointer p-2 text-sm text-gray-700 duration-200 hover:text-orange-500',
+                      {
+                        'text-orange-500': String(brand.id) === queryConfig.brandId,
+                      }
+                    )}
+                  >
+                    <Link
+                      to={{
+                        pathname: path.home,
+                        search: createSearchParams({ ...queryConfig, brandId: brand.id.toString() }).toString(),
+                      }}
+                    >
+                      {brand.name}
+                    </Link>
+                  </li>
+                );
+            })}
         </ul>
+        {brands.length > 5 && !isLoadMoreBrand.isLoadMore && (
+          <button
+            onClick={() => {
+              setIsLoadMoreBrand({
+                isLoadMore: true,
+                lengthBrands: brands.length,
+              });
+            }}
+            className='flex w-full cursor-pointer items-center justify-center p-2 text-gray-700 duration-200'
+          >
+            <span className='text-base'>Mở rộng</span>
+            <span className='ml-1 flex items-center justify-center'>
+              <FaAngleDown color='#374151' size={20} />
+            </span>
+          </button>
+        )}
+        {brands.length > 5 && isLoadMoreBrand.isLoadMore && (
+          <button
+            onClick={() => {
+              setIsLoadMoreBrand({
+                isLoadMore: false,
+                lengthBrands: 5,
+              });
+            }}
+            className='flex w-full cursor-pointer items-center justify-center p-2 text-gray-700 duration-200'
+          >
+            <span className='text-base'>Thu gọn</span>
+            <span className='ml-1 flex items-center justify-center'>
+              <FaAngleUp color='#374151' size={20} />
+            </span>
+          </button>
+        )}
       </div>
+      <hr />
       <div className='mt-2'>
         <p className='text-base text-black'>{t('asignfilter.price')}</p>
         <form className='mt-2 flex flex-col' noValidate onSubmit={onSubmit}>
@@ -97,6 +145,7 @@ function AsignFilter({ queryConfig, brands }: Props) {
           </button>
         </form>
       </div>
+      <hr />
       <div className='mt-2'>
         <p className='text-base text-black'>{t('asignfilter.rating')}</p>
         <div>

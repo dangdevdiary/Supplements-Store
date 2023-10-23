@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import logo from 'src/assets/logo.svg';
+import logo from 'src/assets/img/logo.png';
 import path from 'src/constants/path';
 import { useTranslation } from 'react-i18next';
 
@@ -105,14 +105,14 @@ function Footer() {
           </ul>
         </div>
         <div>
-          <Link to={path.home} className='flex items-center bg-orange-500 shadow-md'>
+          <Link to={path.home} className='flex items-center rounded-md bg-orange-500 px-2 py-4 shadow-md'>
             <img src={logo} alt='Logo' />
           </Link>
         </div>
       </div>
       <div className='bg-gray-100 px-4 py-6 md:flex md:items-center md:justify-between'>
         <span className='text-sm text-gray-500  sm:text-center'>
-          © 2023 <a href='https://flowbite.com/'>Fstore™</a>. All Rights Reserved.
+          © 2023 <a href='https://flowbite.com/'>Wheystore™</a>. All Rights Reserved.
         </span>
         <div className='mt-4 flex space-x-6 sm:justify-center md:mt-0'>
           <a href='#ads' className='text-gray-400 hover:text-gray-900'>

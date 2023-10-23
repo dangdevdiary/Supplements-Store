@@ -7,9 +7,8 @@ import { AppDataSource } from "./app/database";
 import { Routes } from "./app/routes";
 import passport from "passport";
 import bodyParser from "body-parser";
-// import { craw } from "./app/utils/helpers";
 import { connectRedis, client } from "./app/database/connectRedis";
-import { HttpError } from "http-errors";
+import createHttpError, { HttpError } from "http-errors";
 import session from "express-session";
 import RedisStore from "connect-redis";
 import cokieParser from "cookie-parser";
@@ -57,12 +56,29 @@ AppDataSource.initialize()
       setUpRoute(app);
     });
     // catch error
+    app.use((_req: Request, _res: Response, next: NextFunction) => {
+      return next(
+        createHttpError.NotFound("Not found Route please check again!")
+      );
+    });
     app.use(
-      (err: HttpError, _req: Request, res: Response, _next: NextFunction) => {
-        res.status(err.status || 500).json({
-          message: err.message,
-          status: err.status || 500,
-        });
+      (
+        err: HttpError | Error,
+        _req: Request,
+        res: Response,
+        _next: NextFunction
+      ) => {
+        if (createHttpError.isHttpError(err)) {
+          return res.status(err.status || 500).json({
+            message: err.message,
+            status: err.status || 500,
+          });
+        } else {
+          return res.status(500).json({
+            message: err.message,
+            status: 500,
+          });
+        }
       }
     );
     app.listen(PORT, () => {
@@ -70,9 +86,4 @@ AppDataSource.initialize()
     });
   })
 
-  // .then(() => {
-  //   craw().catch(() => {
-  //     console.log("errr");
-  //   });
-  // })
   .catch((error) => console.log("error when connect to database", error));

@@ -4,6 +4,8 @@ import err from "../middlewares/error";
 import { BadRequestError, isError } from "../utils/error";
 import { User } from "../utils/user";
 import createHttpError from "http-errors";
+import { EGender } from "../entities/user.entity";
+import { bfpFemale, bfpMale, bmi as bmiC } from "../utils/suggest";
 
 export const getAll = async (
   req: Request,
@@ -14,13 +16,14 @@ export const getAll = async (
     limit = 10,
     page = 1,
     brandId,
+    cateId,
     price_min,
     price_max,
     rate,
     search,
     order = "newest",
   } = req.query;
-  if (!brandId && !price_max && !price_min && !rate) {
+  if (!brandId && !price_max && !price_min && !rate && !cateId) {
     const rs = await productServices.getAll(
       Number(limit),
       Number(page),
@@ -40,6 +43,7 @@ export const getAll = async (
           max: price_max ? Number(price_max) : undefined,
         },
         rate: rate ? Number(rate) : undefined,
+        cateId: cateId ? Number(cateId) : undefined,
       },
       search && String(search),
       String(order)
@@ -61,6 +65,7 @@ export const create = async (
       weigth,
       price,
       brandId,
+      cateId,
       productionDate,
       expirationDate,
     } = req.body;
@@ -72,11 +77,49 @@ export const create = async (
       { name, description, productionDate, expirationDate },
       { flavor, weigth, price },
       path.replace(`public\\`, ""),
-      brandId
+      brandId,
+      cateId
     );
     return createHttpError.isHttpError(rs)
       ? next(rs)
       : res.status(201).json(rs);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const suggestProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { weight, height, neck, waist, hip, gender } = req.body;
+
+    let bfp = 0;
+    if (!weight || !height || !neck || !waist || !gender)
+      return next(
+        createHttpError.BadRequest("Missing infomation to calculate")
+      );
+    const bmi = bmiC(weight, height).toFixed(1);
+    if (gender === EGender.FEMALE) {
+      bfp = Number(bfpFemale(height, waist, neck, hip).toFixed(1));
+      const suggest = await productServices.suggestProduct(
+        Number(bmi),
+        bfp,
+        EGender.FEMALE
+      );
+      return res.status(200).json(suggest);
+    }
+    if (gender === EGender.MALE) {
+      bfp = Number(bfpMale(height, waist, neck).toFixed(1));
+      const suggest = await productServices.suggestProduct(
+        Number(bmi),
+        bfp,
+        EGender.MALE
+      );
+      return res.status(200).json(suggest);
+    }
   } catch (error) {
     next(error);
   }

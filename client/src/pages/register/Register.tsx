@@ -54,7 +54,7 @@ function Register() {
         {/* login section */}
         <div className='row-span-2 p-4 md:col-span-2'>
           <div className='text-left font-bold'>
-            <span className='text-sm text-orange-500'>Fstore</span>
+            <span className='text-sm text-orange-500'>Wheystore</span>
           </div>
           <div className='py-10'>
             <h2 className='mb-2 text-3xl font-bold text-form'>{t('register.sign up account')}</h2>

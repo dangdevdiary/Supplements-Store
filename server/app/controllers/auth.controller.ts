@@ -57,7 +57,6 @@ export const logOut = async (
     if (!refreshToken)
       return next(createHttpError.NotFound("refresh token not found!"));
     const payload = await verifyRefreshToken(refreshToken as string);
-
     if (!payload)
       return next(createHttpError.BadRequest("Invalid refresh token"));
     await client.del(payload.userId.toString()).catch((err) => {
