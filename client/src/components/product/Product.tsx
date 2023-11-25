@@ -22,7 +22,7 @@ function Product({ product }: Props) {
           </div>
           <div className='p-1'>
             <span className='text-base text-orange-700 line-clamp-1'>
-              {formatPrice(Number(product.product_options[0].price))}
+              {formatPrice(Number(product.productOptions[0].price))}
             </span>
           </div>
           <div className='flex items-center justify-between'>

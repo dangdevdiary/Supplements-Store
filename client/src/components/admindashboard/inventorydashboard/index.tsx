@@ -107,7 +107,7 @@ export default function InventoryDashboard() {
   };
   return (
     <div className='px-2'>
-      <BreadCrumb path={['Fstore', t('maindashboard.admin'), t('maindashboard.inventory')]} />
+      <BreadCrumb path={['Wheystore', t('maindashboard.admin'), t('maindashboard.inventory')]} />
       <HelmetSEO title={t('inventory.manageinven')} />
       <div className='mt-4'>
         <div className='relative'>
@@ -166,16 +166,13 @@ export default function InventoryDashboard() {
                     {t('product.name')}
                   </th>
                   <th scope='col' className='px-6 py-6'>
-                    {t('detailproduct.color')}
+                    Vị
                   </th>
                   <th scope='col' className='px-6 py-6'>
-                    RAM
+                    Trọng lượng
                   </th>
                   <th scope='col' className='px-6 py-6'>
-                    ROM
-                  </th>
-                  <th scope='col' className='px-6 py-6'>
-                    {t('orders.quantity')}
+                    Số lượng
                   </th>
                 </tr>
               </thead>
@@ -187,9 +184,8 @@ export default function InventoryDashboard() {
                       <th scope='row' className='whitespace-nowrap px-6 py-4 font-medium text-gray-900'>
                         {product.name}
                       </th>
-                      <td className='px-6 py-4'>{product.color}</td>
-                      <td className='px-6 py-4'>{product.ram}</td>
-                      <td className='px-6 py-4'>{product.rom}</td>
+                      <td className='px-6 py-4'>{product.flavor}</td>
+                      <td className='px-6 py-4'>{product.weight}</td>
                       <td className='px-6 py-4'>{product.quantity}</td>
                     </tr>
                   ))}
@@ -198,7 +194,7 @@ export default function InventoryDashboard() {
           </div>
         </div>
         <Pagination
-          pageSize={data?.data.last_page ? data.data.last_page : 1}
+          pageSize={data?.data?.last_page ? data.data.last_page : 1}
           queryConfig={{ ...queryParams, path: '/admin/inventory' }}
         />
       </div>
@@ -271,7 +267,7 @@ export default function InventoryDashboard() {
           </table>
         </div>
         <Pagination
-          pageSize={inboundNote?.data.last_page ? inboundNote.data.last_page : 1}
+          pageSize={inboundNote?.data?.last_page ? inboundNote.data.last_page : 1}
           queryConfig={{ ...queryParamsInbound, path: '/admin/inventory' }}
         />
       </section>

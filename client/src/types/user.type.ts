@@ -14,6 +14,11 @@ export type User = {
     id: number;
     address: string;
   }[];
+  avatar: {
+    id: string;
+    type: string;
+    imageUrl: string;
+  };
 };
 export interface ResGetAllUser {
   current_page: number;

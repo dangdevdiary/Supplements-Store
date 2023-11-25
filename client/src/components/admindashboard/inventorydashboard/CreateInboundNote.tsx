@@ -18,9 +18,8 @@ interface ProductData {
   quantity: number;
   images: string;
   name: string;
-  ram: string;
-  rom: string;
-  color: string;
+  flavor: string;
+  weight: string;
 }
 
 enum ModeCreateInboundNote {
@@ -35,9 +34,8 @@ function CreateInboundNote() {
     quantity: 0,
     images: '',
     name: '',
-    ram: '',
-    rom: '',
-    color: '',
+    flavor: '',
+    weight: '',
   });
   const [selectedArr, setSelectedArr] = useState<ProductData[]>([]);
   const [mode, setMode] = useState<ModeCreateInboundNote>();
@@ -54,6 +52,7 @@ function CreateInboundNote() {
     retry: 1,
     refetchOnWindowFocus: false,
     onSuccess(data) {
+      console.log(data.data.data);
       setStateCreateInboundNote(data.data.data);
       setSelected(data.data.data[0]);
     },
@@ -194,7 +193,7 @@ function CreateInboundNote() {
   return (
     <>
       <HelmetSEO title={t('inventory.createinvoice')} />
-      <BreadCrumb path={['Fstore', t('maindashboard.admin'), t('maindashboard.inventory'), t('inventory.cre')]} />
+      <BreadCrumb path={['Wheystore', t('maindashboard.admin'), t('maindashboard.inventory'), t('inventory.cre')]} />
       <section className='mt-2 flex min-h-full flex-col items-center justify-start bg-white'>
         <header className='flex w-full items-center border-b p-2 lg:w-1/2'>
           <aside className='mr-2 w-full'>
@@ -203,9 +202,7 @@ function CreateInboundNote() {
                 <div className='relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left  focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm'>
                   <Combobox.Input
                     className='w-full border border-emerald-500 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0'
-                    displayValue={(product: ProductData) =>
-                      `${product.name} - ${product.ram}/${product.rom} - ${product.color}`
-                    }
+                    displayValue={(product: ProductData) => `${product.name} - ${product.flavor} - ${product.weight}`}
                     onChange={(event) => setQuery(event.target.value)}
                   />
                   <Combobox.Button className='absolute inset-y-0 right-0 flex items-center pr-2'>
@@ -243,7 +240,7 @@ function CreateInboundNote() {
                                   alt='img'
                                   className='mr-2 max-h-[2rem] object-cover'
                                 />
-                                <span>{`${product.name} - ${product.ram}/${product.rom} - ${product.color}`}</span>
+                                <span>{`${product.name} - ${product.flavor} - ${product.weight}`}</span>
                               </span>
                               {selected ? (
                                 <span
@@ -283,7 +280,7 @@ function CreateInboundNote() {
                 <div key={prod.product_option_id} className='mt-2 flex cursor-pointer items-center bg-slate-50'>
                   <img src={`${baseURL}/${prod.images}`} className='max-h-[3rem] object-cover' alt='' />
                   <div className='ml-2 flex flex-grow flex-col'>
-                    <span className='text-xs md:text-base'>{`${prod.name} - ${prod.ram}/${prod.rom} - ${prod.color}`}</span>
+                    <span className='text-xs md:text-base'>{`${prod.name} - ${prod.flavor} - ${prod.weight}`}</span>
                     <button
                       onClick={() => handleDelete(prod.product_option_id)}
                       className='inline-block text-start text-xs text-orange-400 hover:text-orange-600'

@@ -54,7 +54,7 @@ export default function UserDashboard() {
   return (
     <section className='px-2'>
       <HelmetSEO title={t('user.manage users')} />
-      <BreadCrumb path={['Fstore', t('user.addashboard'), t('user.manage users')]} />
+      <BreadCrumb path={['Wheystore', t('user.addashboard'), t('user.manage users')]} />
       <div className='mt-2 overflow-x-auto rounded-lg border border-gray-200 shadow-md'>
         <table className='w-full border-collapse bg-white text-left text-sm text-gray-500'>
           <thead className='bg-teal-400'>

@@ -1,4 +1,4 @@
-import { Product, ProductData, ProductListConfig, ProductsList } from 'src/types/product.type';
+import { ISuggestProduct, Product, ProductListConfig, ProductsList } from 'src/types/product.type';
 import http from 'src/utils/http';
 const URL = '/product/';
 const timeout = (ms: number) => {
@@ -56,9 +56,8 @@ const productsApi = {
   async updateOption(
     product_option_id: number,
     data: {
-      ram?: string;
-      rom?: string;
-      color?: string;
+      flavor?: string;
+      weight?: string;
       price?: string;
     }
   ) {
@@ -75,6 +74,19 @@ const productsApi = {
   },
   async trackingProduct(productId: number) {
     return await http.get(`analysis/tracking_product/${productId}`);
+  },
+  async suggestProducts(sugestion: {
+    weight: number;
+    height: number;
+    waist: number;
+    neck: number;
+    hip?: number;
+    gender: string;
+  }) {
+    return await http.post<{
+      status: string;
+      data: Product[];
+    }>('product/suggest', sugestion);
   },
 };
 

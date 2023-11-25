@@ -132,7 +132,7 @@ function Header() {
         <nav className='border-gray-200 px-2 py-2.5 sm:px-4'>
           <div className='mx-auto flex max-w-7xl items-center justify-between'>
             <Link to={path.home} className='mx-0 flex flex-shrink-0 items-center md:min-w-[2rem] md:p-2'>
-              <img src={logo} className='mr-1 h-6 md:h-9' alt='fstore Logo' />
+              <img src={logo} className='mr-1 h-6 md:h-9' alt='Wheystore Logo' />
             </Link>
             <div className='hidden items-center px-2 lg:flex'>
               <BsTelephoneForward className='mr-2 text-lg' />

@@ -69,7 +69,7 @@ function ProductDetails() {
       }
     },
     onSuccess: (data) => {
-      const op = data.data.product_options;
+      const op = data.data.productOptions;
       for (let i = 0; i < op.length; i++) {
         if (op[i].quantity) {
           setOptionSelected({ ...op[i], index: i });
@@ -137,7 +137,7 @@ function ProductDetails() {
       toast.error(t('productdetail.select product'));
       return;
     }
-    const opt = product?.data.product_options.find((e) => {
+    const opt = product?.data.productOptions.find((e) => {
       return e.product_option_id === optionSelected.product_option_id;
     });
     if (product?.data.id && product.data.name && opt?.price && opt.product_option_id) {
@@ -165,7 +165,7 @@ function ProductDetails() {
           <BreadCrumb
             key={nanoid()}
             path={[
-              'Fstore',
+              'Wheystore',
               t('productdetail.list of products'),
               t('productdetail.product details'),
               product?.data.name as string,
@@ -174,15 +174,15 @@ function ProductDetails() {
         </div>
 
         <div className=' md:hidden'>
-          <BreadCrumb key={nanoid()} path={['Fstore', '...', '...', product?.data.name as string]} />
+          <BreadCrumb key={nanoid()} path={['Wheystore', '...', '...', product?.data.name as string]} />
         </div>
       </div>
       <div className='mx-auto mt-1 grid grid-cols-1 grid-rows-1 bg-white shadow-md md:p-4 lg:w-[80%] lg:grid-cols-[1fr,2fr]'>
         {!isLoading && (
           <div>
-            {product?.data.product_options && product.data.product_options.every((e) => e.image !== null) ? (
+            {product?.data.productOptions && product.data.productOptions.every((e) => e.image !== null) ? (
               <Carousel selectedItem={optionSelected?.index} showThumbs={false} emulateTouch={true}>
-                {product?.data.product_options.map((item, i) => (
+                {product?.data.productOptions.map((item, i) => (
                   <div key={i}>
                     <img className='object-contain' src={`${baseURL}/${item.image?.imageUrl}`} alt={`${i} Slide`} />
                   </div>
@@ -190,7 +190,7 @@ function ProductDetails() {
               </Carousel>
             ) : (
               <Carousel showThumbs={false} infiniteLoop={true} emulateTouch={true}>
-                {product?.data.product_options.map((item, i) => {
+                {product?.data.productOptions.map((item, i) => {
                   return (
                     <div key={item.product_option_id}>
                       <img
@@ -205,7 +205,7 @@ function ProductDetails() {
             )}
             {product?.data.specs.length !== 0 && (
               <div>
-                <h1 className='my-2 px-2 text-base font-semibold text-black'>Cấu hình chi tiết</h1>
+                <h1 className='my-2 px-2 text-base font-semibold text-black'>Thông số chi tiết</h1>
                 <ul>
                   {product?.data &&
                     product.data.specs.map((spec) => (
@@ -233,8 +233,8 @@ function ProductDetails() {
             </div>
             <div>
               <div className='grid min-h-[2rem] w-full grid-cols-1 gap-4 md:grid-cols-2'>
-                {product?.data.product_options &&
-                  product.data.product_options.map((op, index) => {
+                {product?.data.productOptions &&
+                  product.data.productOptions.map((op, index) => {
                     return (
                       // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                       <button
@@ -250,8 +250,8 @@ function ProductDetails() {
                         onClick={() => setOptionSelected({ ...op, index })}
                       >
                         <div className='flex items-center justify-around'>
-                          <span className='text-orange-400'>Vị: {op.flavor}</span>
-                          <span className='text-blue-400'>{op.weigth}</span>
+                          <span className='text-orange-400'>Vị: {op.flavor === 'none' ? 'Không vị' : op.flavor}</span>
+                          <span className='text-blue-400'>{op.weight}</span>
                         </div>
                         <div className='flex items-center justify-around'>
                           <span className='text-3xl'>{formatPrice(Number(op.price))}</span>

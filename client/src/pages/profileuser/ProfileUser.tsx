@@ -20,10 +20,12 @@ function ProfileUser() {
   const [breadcrumbs, setBreadcrums] = useState<string>('');
   const { id: userId } = useSelector((state: RootState) => state.userReducer.userInfo);
   const { data: user, refetch } = useQuery({
-    queryKey: ['user', userId],
-    queryFn: () => userApi.getUserByid(userId as number),
-    enabled: userId !== undefined,
-    staleTime: 15000,
+    queryKey: ['user'],
+    queryFn: () => userApi.getUserByid(userId ? Number(userId) : -1),
+    enabled: false,
+    // staleTime: 15000,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
   const matchFile: PathMatch<string> | null = useMatch('/profile/file');
   const matchAddress: PathMatch<string> | null = useMatch('/profile/address');
@@ -57,12 +59,12 @@ function ProfileUser() {
     <>
       {breadcrumbs && (
         <div className='mx-auto my-2 max-w-7xl'>
-          <BreadCrumb path={['Fstore', `${t('profileUser.my account')}`, breadcrumbs]} />
+          <BreadCrumb path={['Wheystore', `${t('profileUser.my account')}`, breadcrumbs]} />
         </div>
       )}
       {!breadcrumbs && (
         <div className='mx-auto my-2 max-w-7xl'>
-          <BreadCrumb path={['Fstore', t('profileUser.my account')]} />
+          <BreadCrumb path={['Wheystore', t('profileUser.my account')]} />
         </div>
       )}
       <HelmetSEO title={t('profileUser.my account')}></HelmetSEO>

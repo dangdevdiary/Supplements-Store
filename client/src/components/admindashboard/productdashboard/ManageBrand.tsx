@@ -7,7 +7,6 @@ import { popup, selectCurrentModal } from 'src/slices/modal.slice';
 import { toast } from 'react-toastify';
 import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
 import HelmetSEO from 'src/components/Helmet';
-import Pagination from 'src/components/paginate';
 import { useTranslation } from 'react-i18next';
 
 const BrandModal = ({
@@ -234,7 +233,9 @@ export default function ManageBrand() {
                             <tr key={i.toString()}>
                               <td className='whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800'>{e.id}</td>
                               <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.name}</td>
-                              <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.description}</td>
+                              <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>
+                                {e.description.substring(0, 46)} ...
+                              </td>
                               <td className='whitespace-nowrap px-6 py-4 text-right text-sm font-medium'>
                                 <button
                                   className='text-green-500 hover:text-green-700'

@@ -5,9 +5,11 @@ import MainDashboard from 'src/components/admindashboard/maindashboard/MainDashb
 import OrderDashboard from 'src/components/admindashboard/orderdashboard';
 import DetailOrder from 'src/components/admindashboard/orderdashboard/DetailOrder';
 import ProductDashboard from 'src/components/admindashboard/productdashboard';
+import CategoryForm from 'src/components/admindashboard/productdashboard/CategoryForm';
 import DetailProduct from 'src/components/admindashboard/productdashboard/DetailProduct';
 import DetailProductOption from 'src/components/admindashboard/productdashboard/DetailProductOption';
 import ManageBrand from 'src/components/admindashboard/productdashboard/ManageBrand';
+import ManageCategory from 'src/components/admindashboard/productdashboard/ManageCategory';
 import ManageCoupon from 'src/components/admindashboard/productdashboard/ManageCoupon';
 import ManageProduct from 'src/components/admindashboard/productdashboard/ManageProduct';
 import ProductForm from 'src/components/admindashboard/productdashboard/ProductForm';
@@ -37,4 +39,6 @@ export const dashboard_tab: dashboardTabInterface[] = [
   { name: 'report', component: <ReportDashboard />, link: '/report' },
   { name: 'user', component: <UserDashboard />, link: '/user' },
   { name: 'user', component: <UserDetails />, link: '/user/details/:userId' },
+  { name: 'category', component: <ManageCategory />, link: '/category' },
+  { name: 'category', component: <CategoryForm />, link: '/category/create' },
 ];

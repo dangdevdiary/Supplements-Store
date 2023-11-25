@@ -29,6 +29,7 @@ import { useEffect } from 'react';
 import ForgotPassword from './pages/forgotpassword';
 import LoginGGSuccess from './pages/login/LoginGoogle/LoginGGSuccess';
 import LoginGGFail from './pages/login/LoginGoogle/LoginGGFail';
+import SuggestProducts from './pages/products/suggest/SuggestProducts';
 function App() {
   useEffect(() => {
     localStorage.theme = 'light';
@@ -45,6 +46,7 @@ function App() {
               <Banner />
               <ProductList />
               <Discount />
+              <SuggestProducts />
               <TopProducts />
             </MainLayout>
           }
@@ -85,7 +87,7 @@ function App() {
               </Profile>
             }
           ></Route>
-          
+
           <Route
             path={path.cart}
             element={
@@ -156,7 +158,7 @@ function App() {
         />
         <Route path='*' element={<NotFound />} />
       </Routes>
-      <ToastContainer></ToastContainer>
+      <ToastContainer autoClose={2000}></ToastContainer>
     </div>
   );
 }

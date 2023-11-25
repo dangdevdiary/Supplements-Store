@@ -65,7 +65,7 @@ export const addSubCate = async (
   try {
     const { parentCateId, cateName, cateDescription } = req.body;
     const rs = await categoryService.addSubCategory(
-      parentCateId,
+      Number(parentCateId),
       cateName,
       cateDescription
     );
@@ -87,9 +87,10 @@ export const updateCate = async (
 ) => {
   try {
     const { cateId } = req.params;
-    const { cateName, cateDescription } = req.body;
+    const { cateName, cateDescription, parentCateId } = req.body;
     const rs = await categoryService.updateCategory(
       Number(cateId),
+      Number(parentCateId),
       cateName,
       cateDescription
     );

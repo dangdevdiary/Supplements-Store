@@ -13,20 +13,20 @@ const productOptionRepository = AppDataSource.getRepository(ProductOption);
 
 export interface ProductOptionInterface {
   flavor: string;
-  weigth: string;
+  weight: string;
   price: number;
 }
 
 export const create = async (
   productId: number,
-  product_options: ProductOptionInterface,
+  productOptions: ProductOptionInterface,
   imagePath: string
 ) => {
   try {
     const product = await productRepository.findOneBy({ id: productId });
     if (!product) return createHttpError.BadRequest("product not found");
-    if (product_options.price && imagePath) {
-      const { flavor, weigth, price } = product_options;
+    if (productOptions.price && imagePath) {
+      const { flavor, weight, price } = productOptions;
 
       // price
       const priceRepo = AppDataSource.getRepository(Price);
@@ -48,7 +48,7 @@ export const create = async (
 
       const new_options = productOptionRepository.create({
         flavor,
-        weigth,
+        weight,
         price: new_price,
         product,
         warehouse: await warehouseRepo.save(
@@ -84,7 +84,7 @@ export const updateOne = async (id: number, data: ProductOptionInterface) => {
       price: true,
     },
   });
-  const { weigth, flavor, price } = data;
+  const { weight, flavor, price } = data;
   if (!option) return BadRequestError("option not found");
   let price_update = 0;
   if (price) {
@@ -100,9 +100,9 @@ export const updateOne = async (id: number, data: ProductOptionInterface) => {
     await priceRepo.update({ id: option.price.id }, { price: price });
     price_update = 1;
   }
-  return flavor || weigth
+  return flavor || weight
     ? {
-        ...(await productOptionRepository.update({ id }, { flavor, weigth })),
+        ...(await productOptionRepository.update({ id }, { flavor, weight })),
         price_update,
       }
     : { price_update };

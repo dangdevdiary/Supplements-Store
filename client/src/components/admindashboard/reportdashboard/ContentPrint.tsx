@@ -28,7 +28,7 @@ export type Ref = HTMLDivElement;
 const ContentPrint = forwardRef<Ref, Props>((props, ref) => (
   <div ref={ref} className='rounded-sm bg-white p-2 shadow-md'>
     <div className='relative overflow-x-auto'>
-      <h1 className='text-center text-xl font-semibold uppercase'>CTY TNHH 3 thành viên Fstore</h1>
+      <h1 className='text-center text-xl font-semibold uppercase'>CTY TNHH 3 thành viên Wheystore</h1>
       <h2 className='text-center text-lg font-semibold uppercase'>Báo cáo doanh thu và sản phẩm trong kho</h2>
       <time className='block text-center font-semibold'>
         {convertDate(props.value.startDate)} - {convertDate(props.value.endDate)}

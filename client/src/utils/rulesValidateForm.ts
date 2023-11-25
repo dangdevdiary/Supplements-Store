@@ -131,8 +131,19 @@ export const changePassSchema = yup.object({
     .max(18, 'password có tối đa 18 ký tự')
     .oneOf([yup.ref('newPassword')], 'password không khớp'),
 });
+
+export const suggestProductSchema = yup.object({
+  weight: yup.number().positive().required('Cân nặng bắt buộc nhập'),
+  height: yup.number().positive().required('Chiều cao bắt buộc nhập'),
+  waist: yup.number().positive().required('Vòng eo bắt buộc nhập'),
+  neck: yup.number().positive().required('Chu vi cổ bắt buộc nhập'),
+  gender: yup.string().required('Giới tính bắt buộc chọn'),
+  hip: yup.number().positive(),
+});
+
 export type ChangePass = yup.InferType<typeof changePassSchema>;
 export type LoginSchema = yup.InferType<typeof loginSchema>;
 export type Schema = yup.InferType<typeof schema>;
 export type FilterPriceSchema = yup.InferType<typeof filterPriceSchema>;
 export type UpdateUserInfoSchema = yup.InferType<typeof updateInfo>;
+export type SuggestProductSchema = yup.InferType<typeof suggestProductSchema>;

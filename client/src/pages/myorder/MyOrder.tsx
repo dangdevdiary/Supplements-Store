@@ -96,8 +96,11 @@ function MyOrder() {
     <div className='mx-auto max-w-7xl p-2'>
       <HelmetSEO title={t('myorder.title')}></HelmetSEO>
       <div className='mx-auto my-2 max-w-7xl'>
-        <BreadCrumb path={['Fstore', t('myorder.title')]} />
+        <BreadCrumb path={['Wheystore', t('myorder.title')]} />
       </div>
+      {!orders?.data.length && (
+        <div className='text-center text-lg text-orange-500'>Bạn vẫn chưa có đơn hàng nào nhanh tay mua sắm nào</div>
+      )}
       {orders?.data.length &&
         orders.data.map((order, i) => (
           <div
@@ -232,7 +235,7 @@ function MyOrder() {
                           <div className='uppercase'>
                             <span className='border border-slate-300 px-1 text-xs md:text-sm'>{orderItem.flavor}</span>
                             <span className='hidden border border-slate-300 px-1 md:inline-block'>
-                              {orderItem.weigth}
+                              {orderItem.weight}
                             </span>
                           </div>
                         </div>

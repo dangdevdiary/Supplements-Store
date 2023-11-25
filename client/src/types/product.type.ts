@@ -11,12 +11,19 @@ export interface Product {
   brand: string;
   brand_description: string;
   brandId?: number;
+  category: string;
   rate: number;
   feedback: {
     id: number;
     rate: number;
     comment: string;
     create_at: string;
+    user?: {
+      id: number;
+      email: string;
+      firstName: string;
+      lastName: string;
+    };
   }[];
   specs: {
     id: number;
@@ -28,10 +35,10 @@ export interface Product {
     type: string;
     imageUrl: string;
   };
-  product_options: {
+  productOptions: {
     product_option_id?: number;
     flavor?: string;
-    weigth?: string;
+    weight?: string;
     price?: string;
     quantity?: number;
     image?: {
@@ -96,8 +103,8 @@ export type ProductData = {
   name: string;
   image?: File;
   description: string;
-  ram: string;
-  rom: string;
+  flavor: string;
+  weight: string;
   price: string;
   brandId: number;
   color: string;
@@ -114,8 +121,21 @@ export type ResAnalysGetProducts = {
     quantity: number;
     images: string;
     name: string;
-    ram: string;
-    rom: string;
-    color: string;
+    flavor: string;
+    weight: string;
   }[];
 };
+
+export interface ISuggestProduct {
+  id: number;
+  name: string;
+  expirationDate: string;
+  productionDate: string;
+  images: {
+    id: string;
+    type: string;
+    imageUrl: string;
+  };
+  // category: Category;
+  rate: string;
+}

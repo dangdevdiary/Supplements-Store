@@ -10,7 +10,17 @@ import { Provider } from 'react-redux';
 import { persistor, store } from './store';
 import { HelmetProvider } from 'react-helmet-async';
 import { PersistGate } from 'redux-persist/integration/react';
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    mutations: {
+      retry: 1,
+    },
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>

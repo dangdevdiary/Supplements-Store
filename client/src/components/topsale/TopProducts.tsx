@@ -24,7 +24,7 @@ interface SliderRef extends React.Component<Settings, never> {
 function TopProducts() {
   const { t } = useTranslation();
   const [topSales, setTopSales] = useState<ResTopSale[]>();
-  const dataProductSales = useQuery({
+  useQuery({
     queryKey: ['topSales'],
     queryFn: () => analysisApi.topSales(),
     onSuccess: (data) => {

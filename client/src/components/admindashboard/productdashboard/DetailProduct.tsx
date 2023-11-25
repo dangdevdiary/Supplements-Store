@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import BreadCrumb from '../breadcrumb';
 import { formatPrice } from 'src/utils/formatPrice';
 import HelmetSale from 'src/components/Helmet';
@@ -8,8 +8,11 @@ import productsApi from 'src/apis/product.api';
 import { dateToString } from 'src/utils/convertDate';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineFileSearch } from 'react-icons/ai';
 import { baseURL } from 'src/constants/constants';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AgGridReact } from 'ag-grid-react';
+import { type CellClickedEvent, type ColDef } from 'ag-grid-community';
+import feedbackApi from 'src/apis/feedback.api';
 
 const OptionModal = ({
   id,
@@ -28,44 +31,52 @@ const OptionModal = ({
   >;
   refetch: any;
   data?: {
-    ram: string;
-    rom: string;
-    color: string;
+    flavor: string;
+    weight: string;
     price: string;
     product_option_id: number;
   };
 }) => {
-  const [image, setImage] = useState<File>();
-  const [ram, setRam] = useState(data ? data.ram : '');
-  const [rom, setRom] = useState(data ? data.rom : '');
-  const [color, setColor] = useState(data ? data.color : '');
-  const [price, setPrice] = useState(data ? data.price : '');
+  const [productOptData, setProductOptData] = useState<{
+    image?: File;
+    flavor: string;
+    weight: string;
+    price: string;
+  }>({
+    image: undefined,
+    flavor: data ? data.flavor : '',
+    weight: data ? data.weight : '',
+    price: data ? data.price : '',
+  });
 
   const createOption = async () => {
-    if (!image) {
+    if (!productOptData.image) {
       toast.error('please select image for product');
       return;
     }
     const data = new FormData();
-    data.append('ram', ram);
-    data.append('rom', rom);
-    data.append('color', color);
-    data.append('price', price);
-    data.append('image', image);
-    const response = await productsApi.createOption(id, data);
+    data.append('image', productOptData.image);
+    data.append('flavor', productOptData.flavor);
+    data.append('weight', productOptData.weight);
+    data.append('price', productOptData.price);
 
-    if (response.status === 200) toast.success('create new product success!');
-    else toast.error(`an error occured when create product: ${response.statusText}`);
+    await productsApi
+      .createOption(id, data)
+      .then(() => {
+        toast.success('Tạo tùy chọn thành công');
+      })
+      .catch(() => {
+        toast.error('Không thể tạo tùy chọn');
+      });
   };
 
   const editOption = async () => {
+    console.log(1);
     const response = await productsApi.updateOption(data?.product_option_id ? data.product_option_id : 0, {
-      ram,
-      rom,
-      color,
-      price,
+      flavor: productOptData.flavor,
+      weight: productOptData.weight,
+      price: productOptData.price,
     });
-
     if (response.status === 200) toast.success('update product success!');
     else toast.error(`an error occured when create product: ${response.statusText}`);
   };
@@ -99,36 +110,28 @@ const OptionModal = ({
           <div className='space-y-6 p-2 md:p-6'>
             <div className='grid grid-cols-2 gap-4'>
               <div className='px-4 text-base leading-relaxed text-gray-500 md:px-8'>
-                <p>RAM: </p>
+                <p>Hương vị: </p>
                 <input
-                  onChange={(e) => setRam(e.target.value)}
-                  defaultValue={ram}
+                  onChange={(e) => setProductOptData({ ...productOptData, flavor: e.target.value })}
+                  defaultValue={productOptData.flavor}
                   className='w-full rounded-xl border border-gray-400 px-2 py-2'
                 />
               </div>
               <div className='-ml-10 px-8 text-base leading-relaxed text-gray-500 md:mr-8'>
-                <p>ROM:</p>
+                <p>Trọng lượng:</p>
                 <input
-                  onChange={(e) => setRom(e.target.value)}
-                  defaultValue={rom}
+                  onChange={(e) => setProductOptData({ ...productOptData, weight: e.target.value })}
+                  defaultValue={productOptData.weight}
                   className='w-full rounded-xl border border-gray-400 px-2 py-2'
                 />
               </div>
             </div>
             <div className='grid grid-cols-2 gap-4'>
-              <div className='px-4 text-base leading-relaxed text-gray-500 md:px-8'>
-                <p>{t('detailproduct.color')}: </p>
-                <input
-                  defaultValue={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  className='w-full rounded-xl border border-gray-400 px-2 py-2'
-                />
-              </div>
-              <div className='-ml-10 px-8 text-base leading-relaxed text-gray-500 md:mr-8'>
+              <div className='px-8 text-base leading-relaxed text-gray-500'>
                 <p>{t('detailproduct.price')}:</p>
                 <input
-                  defaultValue={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  defaultValue={productOptData.price}
+                  onChange={(e) => setProductOptData({ ...productOptData, price: e.target.value })}
                   className='w-full rounded-xl border border-gray-400 px-2 py-2'
                 />
               </div>
@@ -142,7 +145,7 @@ const OptionModal = ({
                     onChange={(e) => {
                       const image = e.target.files;
                       if (image?.length) {
-                        setImage(image[0]);
+                        setProductOptData({ ...productOptData, image: image[0] });
                       }
                     }}
                     className='bg-gray-150 w-full cursor-pointer rounded-lg border border-gray-300 text-sm font-medium leading-loose text-gray-900 focus:outline-none'
@@ -177,28 +180,90 @@ const OptionModal = ({
   );
 };
 
+function Btb(
+  e: CellClickedEvent & {
+    btnIcon: ReactNode;
+    mode: string;
+    rowData: { [key: string]: string }[];
+    rowSelected?: { [key: string]: string };
+  }
+) {
+  return <button className='px-2 py-2'>{e.btnIcon}</button>;
+}
+
 export default function DetailProduct() {
   const [modal, setModal] = useState({
     open: false,
     type: 'create',
   });
   const [data_opt, setDataOpt] = useState({
-    ram: '',
-    rom: '',
-    color: '',
+    flavor: '',
+    weight: '',
     price: '',
     product_option_id: 0,
   });
+
   const { productId } = useParams();
   const navigate = useNavigate();
   if (productId === undefined || !Number(productId)) navigate('/admin/product');
-  const { data, refetch } = useQuery(['get_product_details'], () =>
-    productsApi.getProductDetail(productId !== undefined ? productId : '1')
-  );
+  const { data, refetch } = useQuery(['get_product_details'], {
+    queryFn: () => productsApi.getProductDetail(productId !== undefined ? productId : '1'),
+    onSuccess: (data) => {
+      const rs = data.data.feedback.map((e) => {
+        return {
+          ...e,
+          user: e.user?.email || 'user',
+        };
+      });
+      setRowData(rs);
+    },
+  });
+  const deleteFeedbackMutation = useMutation({
+    mutationFn: (fid: number) => feedbackApi.deleteFeedback(fid),
+    onSuccess: () => {
+      toast.success('Xoá đánh giá thành công');
+      refetch();
+    },
+    onError: () => {
+      toast.error('Không thể xóa đánh giá');
+    },
+  });
   const product = data?.data;
-  const product_options = product?.product_options ? product.product_options : [];
+  const productOptions = product?.productOptions ? product.productOptions : [];
   const { t } = useTranslation('addashboard');
+  const [rowData, setRowData] = useState<
+    {
+      id: number;
+      rate: number;
+      comment: string;
+      create_at: string;
+      user: string;
+    }[]
+  >([]);
+  const defaultColDef: ColDef = {
+    sortable: true,
+    filter: true,
+    resizable: true,
+  };
+  const columnDefs: ColDef[] = [
+    { field: 'id', headerName: 'id', width: 60 },
+    { field: 'user', headerName: 'Nguời đánh giá' },
+    { field: 'rate', headerName: 'Số sao', width: 100 },
+    { field: 'comment', headerName: 'Nội dung đánh giá', minWidth: 400, flex: 1 },
 
+    {
+      field: 'delete',
+      headerName: 'Xóa',
+      width: 80,
+      cellRenderer: Btb,
+      cellRendererParams: {
+        btnIcon: <AiOutlineDelete className='text-2xl text-red-500' />,
+      },
+      onCellClicked(event) {
+        deleteFeedbackMutation.mutate(event.data.id);
+      },
+    },
+  ];
   return (
     <div className='mt-4'>
       <HelmetSale title={t('detailproduct.ad detail')}></HelmetSale>
@@ -211,26 +276,34 @@ export default function DetailProduct() {
             <div className='grid w-full gap-4 align-middle'>
               <div className=' overflow-hidden rounded-xl border bg-white p-4 shadow-lg'>
                 <h1 className='py-2 text-lg font-semibold'>{t('detailproduct.productdetails')}</h1>
-                <div className='grid grid-cols-4 pt-1'>
+                <div className='grid grid-cols-4 border-b-2  pt-1'>
                   <p className='col-span-1'>{t('detailproduct.idproduct')}</p>{' '}
                   <p className='col-span-3'>{product?.id}</p>
                 </div>
-                <div className='grid grid-cols-4 pt-1'>
+                <div className='grid grid-cols-4 border-b-2  pt-1'>
                   <p className='col-span-1'>{t('detailproduct.nameproduct')}</p>{' '}
                   <p className='col-span-3'>{product?.name}</p>
                 </div>
-                <div className='grid grid-cols-4 pt-1'>
+                <div className='grid grid-cols-4 border-b-2  pt-1'>
                   <p className='col-span-1'>{t('product.brand')}</p> <p className='col-span-3'>{product?.brand}</p>
                 </div>
-                <div className='grid h-24 grid-cols-4 overflow-hidden pt-1'>
+                <div className='h-26 grid grid-cols-4 overflow-hidden border-b-2  pt-1'>
                   <p className='col-span-1'>{t('product.description')}</p>{' '}
-                  <span className='col-span-3 overflow-ellipsis  line-clamp-4'>{product?.description}</span>
+                  <span className='col-span-3 overflow-ellipsis line-clamp-4'>{product?.description}</span>
                 </div>
-                <div className='grid grid-cols-4 pt-1'>
+                <div className='grid grid-cols-4 border-b-2 pt-1'>
+                  <p className='col-span-1'>Ngày sản xuất</p>{' '}
+                  <span className='col-span-3 overflow-ellipsis  line-clamp-4'>{product?.productionDate}</span>
+                </div>
+                <div className='grid grid-cols-4 border-b-2 pt-1'>
+                  <p className='col-span-1'>Ngày hết hạn</p>{' '}
+                  <span className='col-span-3 overflow-ellipsis  line-clamp-4'>{product?.expirationDate}</span>
+                </div>
+                <div className='grid grid-cols-4 border-b-2 pt-1'>
                   <p className='col-span-1'>{t('detailproduct.createat')}</p>{' '}
                   <p className='col-span-3'>{dateToString(product?.createAt ? product.createAt : '')}</p>
                 </div>
-                <div className='grid grid-cols-4 pt-1'>
+                <div className='grid grid-cols-4 border-b-2 pt-1'>
                   <p className='col-span-1'>{t('detailproduct.updateat')}</p>{' '}
                   <p className='col-span-3'>{dateToString(product?.updateAt ? product.updateAt : '')}</p>
                 </div>
@@ -267,7 +340,7 @@ export default function DetailProduct() {
                       </tr>
                     </thead>
                     <tbody>
-                      {product_options.map((e, i) => {
+                      {productOptions.map((e, i) => {
                         return (
                           <tr className='border-b bg-white' key={i.toString()}>
                             <th className='whitespace-nowrap px-6 py-4 font-medium text-gray-900'>
@@ -280,7 +353,7 @@ export default function DetailProduct() {
                                 alt={`product_image`}
                               />
                             </td>
-                            <td className='px-6 py-4'>{`${e.ram}/${e.rom} - ${e.color}`}</td>
+                            <td className='px-6 py-4'>{`${e.flavor} - ${e.weight}`}</td>
                             <td className='px-6 py-4'>{formatPrice(Number(e.price) ? Number(e.price) : 0)}</td>
                             <td className='px-6 py-4 text-center'>
                               <button className='pr-1 text-blue-500 hover:text-blue-700'>
@@ -293,9 +366,8 @@ export default function DetailProduct() {
                                 className='pr-1 text-green-500 hover:text-green-700'
                                 onClick={() => {
                                   setDataOpt({
-                                    ram: e.ram ? e.ram : '',
-                                    rom: e.rom ? e.rom : '',
-                                    color: e.color ? e.color : '',
+                                    flavor: e.flavor ? e.flavor : '',
+                                    weight: e.weight ? e.weight : '',
                                     price: e.price ? e.price : '',
                                     product_option_id: e.product_option_id ? e.product_option_id : 0,
                                   });
@@ -332,6 +404,25 @@ export default function DetailProduct() {
                       data={modal.type === 'edit' ? data_opt : undefined}
                     />
                   )}
+                </div>
+              </div>
+            </div>
+            <div className='mt-4 mb-4 inline-block w-full gap-4 align-middle'>
+              <div className='rounded-xl bg-white p-4 drop-shadow-lg'>
+                <h1 className='py-2 text-lg font-semibold'>Đánh giá sản phẩm</h1>
+                <div className='ag-theme-balham h-screen w-full'>
+                  <AgGridReact
+                    rowStyle={{ fontSize: '16px', padding: '10px' }}
+                    animateRows
+                    defaultColDef={defaultColDef}
+                    gridOptions={{
+                      rowHeight: 50,
+                      headerHeight: 50,
+                      domLayout: 'autoHeight',
+                    }}
+                    rowData={rowData}
+                    columnDefs={columnDefs}
+                  ></AgGridReact>
                 </div>
               </div>
             </div>

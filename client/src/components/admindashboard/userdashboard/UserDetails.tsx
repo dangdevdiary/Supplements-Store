@@ -51,7 +51,7 @@ function UserDetails() {
   return (
     <section>
       <HelmetSEO title={t('user.userdetail')} />
-      <BreadCrumb path={['Fstore', '...', t('user.manage users'), t('user.userdetail')]} />
+      <BreadCrumb path={['Wheystore', '...', t('user.manage users'), t('user.userdetail')]} />
       <div className='mt-2 max-w-2xl overflow-hidden bg-white shadow sm:rounded-lg'>
         <div className='px-4 py-5 sm:px-6'>
           <h3 className='text-lg font-medium leading-6 text-gray-900'>{t('user.userdata')}</h3>

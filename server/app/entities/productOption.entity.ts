@@ -22,7 +22,7 @@ export class ProductOption {
   flavor!: string;
 
   @Column({ nullable: true })
-  weigth!: string;
+  weight!: string;
 
   @ManyToOne(() => Product, (product) => product.productOptions, {
     onDelete: "CASCADE",

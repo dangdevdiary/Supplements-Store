@@ -26,8 +26,8 @@ export const PrintOrder = React.forwardRef(
       order_items: {
         product_name: string;
         product_option_id: number;
-        ram: string;
-        rom: string;
+        flavor: string;
+        weight: string;
         color: string;
         quantity: number;
         image: string;
@@ -78,7 +78,7 @@ export const PrintOrder = React.forwardRef(
                 <tr key={i.toString()}>
                   <td className='border border-slate-600'>{i + 1}</td>
                   <td className='border border-slate-600'>{e.product_name}</td>
-                  <td className='border border-slate-600'>{`${e.ram}/${e.rom} - ${e.color}`}</td>
+                  <td className='border border-slate-600'>{`${e.flavor}/${e.weight} - ${e.color}`}</td>
                   <td className='border border-slate-600'>{e.quantity}</td>
                   <td className='border border-slate-600'>{formatPrice(e.prices)}</td>
                   <td className='border border-slate-600'>{formatPrice(e.prices * e.quantity)}</td>

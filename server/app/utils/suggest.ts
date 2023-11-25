@@ -33,18 +33,18 @@ export const BMI: IBmi[] = [
 export const BFPMale: IBmi[] = [
   {
     from: 2,
-    to: 4,
+    to: 4.9,
     result: EResultIndexBody.THIN,
   },
   {
     from: 5,
-    to: 13,
+    to: 13.9,
     result: EResultIndexBody.ATHLETE,
   },
-  { from: 14, to: 17, result: EResultIndexBody.FITNESS },
+  { from: 14, to: 16.9, result: EResultIndexBody.FITNESS },
   {
     from: 17,
-    to: 25,
+    to: 25.9,
     result: EResultIndexBody.NORMAL,
   },
   { from: 26, to: 100, result: EResultIndexBody.FAT },
@@ -53,25 +53,31 @@ export const BFPMale: IBmi[] = [
 export const BFPFemale: IBmi[] = [
   {
     from: 0,
-    to: 12,
+    to: 12.9,
     result: EResultIndexBody.THIN,
   },
   {
     from: 13,
-    to: 20,
+    to: 20.9,
     result: EResultIndexBody.ATHLETE,
   },
-  { from: 21, to: 24, result: EResultIndexBody.FITNESS },
+  { from: 21, to: 24.9, result: EResultIndexBody.FITNESS },
   {
     from: 25,
-    to: 31,
+    to: 31.9,
     result: EResultIndexBody.NORMAL,
   },
   { from: 32, to: 100, result: EResultIndexBody.FAT },
 ];
 
 export const bfpMale = (height: number, waist: number, neck: number) => {
-  return 86.01 * Math.log10(waist - neck) - 70.041 * Math.log10(height) + 36.76;
+  return (
+    495 /
+      (1.0324 -
+        0.19077 * Math.log10(waist - neck) +
+        0.15456 * Math.log10(height)) -
+    450
+  );
 };
 export const bfpFemale = (
   height: number,
@@ -79,11 +85,13 @@ export const bfpFemale = (
   neck: number,
   hip: number
 ) => {
-  return (
-    163.205 * Math.log10(waist + hip - neck) -
-    97.684 * Math.log10(height) -
-    78.387
-  );
+  const rs =
+    495 /
+      (1.29579 -
+        0.35004 * Math.log10(waist + hip - neck) +
+        0.221 * Math.log10(height)) -
+    450;
+  return rs;
 };
 
 export const bmi = (weight: number, height: number) => {

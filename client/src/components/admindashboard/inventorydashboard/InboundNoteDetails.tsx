@@ -49,7 +49,7 @@ function InboundNoteDetails() {
       <HelmetSEO title={t('inventory.invoicedetail')} />
       <BreadCrumb
         path={[
-          'Fstore',
+          'Wheystore',
           t('maindashboard.admin'),
           t('maindashboard.inventory'),
           t('inventory.inboundnote'),
@@ -110,7 +110,7 @@ function InboundNoteDetails() {
                   <table className='w-full text-left text-sm text-gray-500'>
                     <thead className='bg-cyan-400 text-xs uppercase text-white md:text-sm'>
                       <tr>
-                        <th className='px-4 py-3'>{t('inventory.no.')}</th>
+                        <th className='px-4 py-3'>{t('inventory.no')}</th>
                         <th className='px-6 py-3'>{t('product.name')}</th>
                         <th className='px-6 py-3'>{t('detailproduct.image')}</th>
                         <th className='px-6 py-3'>{t('inventory.configuration')}</th>
@@ -132,7 +132,7 @@ function InboundNoteDetails() {
                                 alt={`product_image`}
                               />
                             </td>
-                            <td className='px-6 py-4'>{`${e.ram}/${e.rom} - ${e.color}`}</td>
+                            <td className='px-6 py-4'>{`${e.flavor} - ${e.weight}`}</td>
                             <td className='px-6 py-4'>{e.quantity}</td>
                           </tr>
                         );

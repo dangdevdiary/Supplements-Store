@@ -49,3 +49,15 @@
 .slick-list {
   overflow: unset;
 }
+.ag-cell {
+  position: absolute;
+  white-space: nowrap;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+.ag-theme-balham .ag-header-cell-label {
+  font-size: 18px; /* Kích thước font mong muốn */
+}

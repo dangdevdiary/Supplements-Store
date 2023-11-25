@@ -16,6 +16,7 @@ import { decreaseStock, increaseStock } from "./inventory.service";
 import { addNewNoti } from "./notification.service";
 import { markAsPaid, markAsRefund } from "./payment.service";
 import { addRemindFeedback } from "./workqueue.service";
+import createHttpError from "http-errors";
 
 interface data_order {
   product_option_id: number;
@@ -59,7 +60,9 @@ export const createOrder = async (
   const orderItemRepo = AppDataSource.getRepository(OrderItem);
   const paymentRepo = AppDataSource.getRepository(Payment);
   const timelineRepo = AppDataSource.getRepository(Timeline);
-  if (!userId || !products) return BadRequestError("missing information");
+  if (!userId || !products)
+    return createHttpError.BadRequest("missing information");
+
   const user = await userRepo.findOne({
     where: {
       id: userId,
@@ -68,8 +71,9 @@ export const createOrder = async (
       address: true,
     },
   });
-  if (!user) return BadRequestError("user not found");
-
+  if (!user) return createHttpError.BadRequest("user not found");
+  if (!address && !user.default_address)
+    return createHttpError.BadRequest("please fill address");
   enum OrderError {
     quantity_exceed,
     item_not_found,
@@ -120,8 +124,7 @@ export const createOrder = async (
       });
     })
   );
-  if (!address && !user.default_address)
-    return BadRequestError("please fill address");
+
   if (err.error) return err.info[0];
 
   const new_order = await orderRepo.save(
@@ -194,7 +197,7 @@ export const getOneOrder = async (order_id: number) => {
         product_name: e.product_option.product.name,
         product_option_id: e.product_option.id,
         flavor: e.product_option.flavor,
-        weigth: e.product_option.weigth,
+        weight: e.product_option.weight,
         price: e.product_option.price,
         quantity: e.quantity,
         image: e.product_option.image.imageUrl,
@@ -288,7 +291,7 @@ export const getAllOrder = async (
                 product_name: el.product_option.product.name,
                 product_option_id: el.product_option.id,
                 flavor: el.product_option.flavor,
-                weigth: el.product_option.weigth,
+                weight: el.product_option.weight,
                 price: el.product_option.price,
                 quantity: el.quantity,
                 prices: el.price,
@@ -360,7 +363,7 @@ export const getAllOrderByUser = async (
                 product_name: el.product_option.product.name,
                 product_option_id: el.product_option.id,
                 flavor: el.product_option.flavor,
-                weigth: el.product_option.weigth,
+                weight: el.product_option.weight,
                 price: el.product_option.price,
                 quantity: el.quantity,
                 prices: el.price,

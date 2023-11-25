@@ -1,6 +1,6 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios, { AxiosError, type AxiosInstance } from 'axios';
 import { ResponseApiLogin } from 'src/types/auth.type';
-import { clearAccessToken, getAccessToken, saveAccessToken } from './auth';
+import { clearAccessToken, getAccessToken, getRefreshToken, saveAccessToken, saveRefreshToken } from './auth';
 class Http {
   instance: AxiosInstance;
   token: string | null;
@@ -13,7 +13,6 @@ class Http {
     });
     this.instance.interceptors.request.use((config) => {
       if (!this.token) this.token = getAccessToken();
-      console.log('🚀 ~ file: http.ts:16 ~ Http ~ this.instance.interceptors.request.use ~ this.token:', this.token);
       config.withCredentials = true;
 
       config.headers['Authorization'] = 'bearer ' + this.token;
@@ -32,15 +31,26 @@ class Http {
           clearAccessToken();
         }
         return res;
+      },
+      async (err) => {
+        if (err.response?.status === 401 && !err.config._retry) {
+          err.config._retry = true;
+          const res = await axios.post<{
+            refreshToken: string;
+            token: string;
+          }>('http://localhost:3000/api/user/refresh-token', {
+            refreshToken: getRefreshToken(),
+          });
+
+          if (res.data) {
+            saveAccessToken(res.data.token);
+            this.token = getAccessToken();
+            saveRefreshToken(res.data.refreshToken);
+            return this.instance(err.config);
+          }
+        }
+        throw err;
       }
-      // function (err: AxiosError) {
-      //   if (err.response?.status !== 422) {
-      //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //     const data: any = err.response?.data;
-      //     const message = data.message || err.message;
-      //     toast.error(message);
-      //   }
-      // }
     );
   }
 }

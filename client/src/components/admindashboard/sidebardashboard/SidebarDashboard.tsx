@@ -2,7 +2,7 @@ import { Menu } from '@headlessui/react';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { AiFillHome } from 'react-icons/ai';
-import { BiMenuAltRight } from 'react-icons/bi';
+import { BiMenuAltRight, BiCategory } from 'react-icons/bi';
 import { BsBack, BsFillCartFill } from 'react-icons/bs';
 import { FaMoneyCheckAlt } from 'react-icons/fa';
 import { IoLanguageSharp } from 'react-icons/io5';
@@ -11,7 +11,7 @@ import { HiChevronDown, HiDocumentReport } from 'react-icons/hi';
 import { IconType } from 'react-icons/lib';
 import { MdInventory, MdPeopleAlt } from 'react-icons/md';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logo from 'src/assets/logo.svg';
+import logo from 'src/assets/img/logo.png';
 import Language from 'src/components/language/Language';
 import useClickOutSide from 'src/hooks/useClickOutSide';
 import { useTranslation } from 'react-i18next';
@@ -114,7 +114,7 @@ function SidebarDashboard() {
         <Link to='/admin'>
           <img src={logo} alt='img' className='max-w-[8rem]' />
         </Link>
-        <div className='hidden w-full flex-grow text-left text-base font-semibold uppercase text-white lg:block lg:text-center'>
+        <div className='hidden w-full flex-grow text-left text-base font-semibold uppercase text-white lg:block lg:text-right'>
           {t('maindashboard.admin')}
         </div>
       </div>
@@ -151,6 +151,7 @@ function SidebarDashboard() {
             link='/order'
             active={location.includes('/order')}
           />
+          <ButtonNav name='Danh Mục' Icon={BiCategory} link='/category' active={location.includes('/category')} />
           <ButtonNav
             name={t('maindashboard.inventory')}
             Icon={MdInventory}

@@ -36,7 +36,13 @@ export const ProductRoutes = (app: Express) => {
   // ? create product
   router.post(
     "/suggest",
-    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
+    [authMiddleware.verifyToken()],
+    product.suggestProduct
+  );
+  // ? get product by category
+  router.post(
+    "/by-category",
+    [authMiddleware.verifyToken()],
     product.suggestProduct
   );
   // ? add img of product

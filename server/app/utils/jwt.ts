@@ -19,7 +19,7 @@ export const signAccessToken = async (user: ItokenValue): Promise<string> => {
       },
       process.env.JWT_ACCESS_KEY || "dangdevdiary",
       {
-        expiresIn: "1d",
+        expiresIn: "3h",
       },
       (err, token) => {
         if (err || !token) {
@@ -82,7 +82,7 @@ export const verifyRefreshToken = async (
                   return resolve(payload as ItokenValue);
               })
               .catch((err) => {
-                reject(err);
+                return reject(err);
               });
           }
           return reject("Unauthorized");

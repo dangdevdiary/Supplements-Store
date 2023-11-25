@@ -6,7 +6,7 @@ interface Props {
     product_name: string;
     product_option_id: number;
     flavor: string;
-    weigth: string;
+    weight: string;
     quantity: number;
     image: string;
     prices: number;
@@ -27,7 +27,7 @@ function OrderItem({ orderItem }: Props) {
               Vị: <i>{orderItem.flavor}</i>
             </span>
             <span className='border-r px-2 text-sm font-medium text-slate-400'>
-              <i>{orderItem.weigth}</i>
+              <i>{orderItem.weight}</i>
             </span>
 
             <div className='inline-block'>

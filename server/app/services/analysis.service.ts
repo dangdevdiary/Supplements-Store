@@ -70,7 +70,7 @@ export const productInWarehouse = async (
             images: e.image?.imageUrl,
             name: e.product.name,
             flavor: e.flavor,
-            weigth: e.weigth,
+            weight: e.weight,
             price: e.price.price,
           };
         }),
@@ -108,7 +108,7 @@ export const top_sale = async () => {
   interface product {
     productId: number;
 
-    product_options: {
+    productOptions: {
       product_option_id: number;
       sale_number: number;
       amount: number;
@@ -124,7 +124,7 @@ export const top_sale = async () => {
       ) {
         products.push({
           productId: item.product_option.product.id,
-          product_options: [
+          productOptions: [
             {
               product_option_id: item.product_option.id,
               sale_number: item.quantity,
@@ -139,21 +139,21 @@ export const top_sale = async () => {
           )
         );
         if (
-          !product?.product_options.find(
+          !product?.productOptions.find(
             (el) => el.product_option_id === item.product_option.id
           )
         ) {
-          product?.product_options.push({
+          product?.productOptions.push({
             product_option_id: item.product_option.id,
             sale_number: item.quantity,
             amount: item.quantity * item.product_option.price.price,
           });
         } else {
-          product.product_options.filter(
+          product.productOptions.filter(
             ({ product_option_id }) =>
               product_option_id === item.product_option.id
           )[0].sale_number += item.quantity;
-          product.product_options.filter(
+          product.productOptions.filter(
             ({ product_option_id }) =>
               product_option_id === item.product_option.id
           )[0].amount += item.quantity * item.product_option.price.price;
@@ -164,7 +164,7 @@ export const top_sale = async () => {
 
   const products_data = products.map((e) => {
     let total = 0;
-    e.product_options.map((el) => {
+    e.productOptions.map((el) => {
       total += el.sale_number;
     });
     return {
@@ -190,7 +190,7 @@ export const top_sale = async () => {
 
         // return {
         //   name: product.name,
-        //   product_options: await Promise.all(e.product_options.map(async (el) => {
+        //   productOptions: await Promise.all(e.productOptions.map(async (el) => {
         //     const opt = await productOptionRepo.findOne({
         //       where:{
 
@@ -208,8 +208,8 @@ export const top_sale = async () => {
         //     });
         //     return {
         //       color: opt?.color,
-        //       ram: opt?.ram,
-        //       rom: opt?.rom,
+        //       flavor: opt?.flavor,
+        //       weight: opt?.weight,
         //       sale_number: el.sale_number,
         //       amount: el.amount,
         //       price: opt?.price.price,

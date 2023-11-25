@@ -59,7 +59,7 @@ export const addAvatar = async (
     Number(uid),
     file.path.replace("public\\", "")
   );
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  return createError.isHttpError(rs) ? next(rs) : res.status(201).json(rs);
 };
 
 export const getOne = async (
@@ -214,7 +214,7 @@ export const sendRefreshToken = async (
     if (!payload) throw createError.BadRequest("token is not valid");
     const accessToken = await signAccessToken(payload);
     const newRefreshToken = await signRefreshToken(payload);
-    res.json({
+    return res.status(200).json({
       token: accessToken,
       refreshToken: newRefreshToken,
     });
@@ -224,6 +224,6 @@ export const sendRefreshToken = async (
         status: 401,
         message: error.message,
       });
-    if (error instanceof Error) return next(error);
+    return next(error);
   }
 };

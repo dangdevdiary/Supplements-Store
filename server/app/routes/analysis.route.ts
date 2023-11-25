@@ -22,7 +22,7 @@ export const AnalysisRoutes = (app: Express) => {
   );
   router.get(
     "/top_sale",
-    [authMiddleware.verifyToken(), authMiddleware.requireAdmin()],
+
     order.top_sale
   );
 

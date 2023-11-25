@@ -118,7 +118,7 @@ export const getAll = async (
               brand: e.brand.name,
               category: e.category.cateName,
               rate: e.rate,
-              product_options: e.productOptions.map((el) => {
+              productOptions: e.productOptions.map((el) => {
                 return {
                   product_option_id: el.id,
                   price: el.price.price,
@@ -150,6 +150,78 @@ export const getProductByCate = async (cateId: number) => {
   }
 };
 
+const addSuggestProduct = async (
+  cateArr: Category[],
+  suggestProduct: Product[]
+) => {
+  const categoryRepo = AppDataSource.getRepository(Category);
+  for (const e of cateArr) {
+    const cate = await categoryRepo.findOne({
+      where: {
+        cateName: e.cateName,
+      },
+      relations: {
+        product: {
+          brand: true,
+          category: {
+            parent: true,
+          },
+          images: true,
+          productOptions: {
+            price: true,
+            image: true,
+            warehouse: true,
+          },
+        },
+      },
+    });
+    if (cate) {
+      suggestProduct = suggestProduct.concat(cate.product);
+    }
+  }
+
+  const productByType: {
+    [key: string]: Product[];
+  } = {};
+  // ? Phân loại các phần tử theo loại
+  suggestProduct.forEach((element) => {
+    if (!productByType[element.category.parent?.cateId.toString() || "mass"]) {
+      productByType[element.category.parent?.cateId.toString() || "mass"] = [];
+    }
+    productByType[element.category.parent?.cateId.toString() || "mass"].push(
+      element
+    );
+  });
+  const top3ProductsByType: Product[] = [];
+  for (const type in productByType) {
+    const elementsOfType = productByType[type];
+    elementsOfType.sort((a, b) => Number(b.rate) - Number(a.rate));
+    top3ProductsByType.push(...elementsOfType.slice(0, 3));
+  }
+  return top3ProductsByType;
+};
+
+const returnSuggestProduct = (resultSuggestProduct: Product[]) => {
+  return resultSuggestProduct.map((e) => {
+    return {
+      id: e.id,
+      name: e.name,
+      expirationDate: e.expirationDate,
+      productionDate: e.productionDate,
+      images: e.images.find((e) => e.type === EnumTypeImage.thumbnail),
+      brand: e.brand.name,
+      category: e.category,
+      rate: e.rate,
+      productOptions: e.productOptions.map((e) => {
+        return {
+          ...e,
+          price: e.price.price,
+        };
+      }),
+    };
+  });
+};
+
 export const suggestProduct = async (
   bmi: number,
   bfp: number,
@@ -158,7 +230,6 @@ export const suggestProduct = async (
   try {
     let rsBmi: EResultIndexBody | undefined;
     let rsBfp: EResultIndexBody | undefined;
-    const categoryRepo = AppDataSource.getRepository(Category);
     BMI.forEach((e) => {
       if (bmi <= e.to && bmi >= e.from) rsBmi = e.result;
     });
@@ -171,95 +242,56 @@ export const suggestProduct = async (
         if (bfp <= e.to && bfp >= e.from) rsBfp = e.result;
       });
     }
+
     if (!rsBmi || !rsBfp)
       return createHttpError.BadRequest("Bmi or Bfp invalid");
+
     const menu = await categoryService.getMenuCategory();
     const dataMenu = menu.data as Category[];
+    let resultSuggestProduct: Product[] = [];
     // ? product for thin person
     if (rsBmi === EResultIndexBody.THIN) {
-      let gainWP: Product[] = [];
       const weightGain = dataMenu.find((e) => e.cateName === ECateType.MASS);
       if (!weightGain) return createHttpError.BadRequest("Category not found");
-      const cate = await categoryRepo.findOne({
-        where: {
-          cateName: ECateType.MASS,
-        },
-        relations: {
-          product: true,
-        },
-      });
-      if (!cate) return createHttpError.BadRequest("Category not found");
-      gainWP = gainWP.concat(cate.product);
-      if (gainWP.length <= 0)
-        return createHttpError.BadRequest("Can't find suggest product list");
-      return gainWP;
+      resultSuggestProduct = await addSuggestProduct(
+        [weightGain],
+        resultSuggestProduct
+      );
+      return returnSuggestProduct(resultSuggestProduct);
     } else if (rsBmi === EResultIndexBody.NORMAL) {
-      let norPro: Product[] = [];
       const health = dataMenu.find((e) => e.cateName === ECateType.HEALTH);
       const muscle = dataMenu.find((e) => e.cateName === ECateType.WHEY);
       if (!muscle || !health)
         return createHttpError.BadRequest("Category not found");
-      for (const e of muscle.children) {
-        const cate = await categoryRepo.findOne({
-          where: {
-            cateName: e.cateName,
-          },
-          relations: {
-            product: true,
-          },
-        });
-        if (!cate) return createHttpError.BadRequest("Category not found");
-        norPro = norPro.concat(cate.product);
-        if (norPro.length <= 0)
-          return createHttpError.BadRequest("Can't find suggest product list");
-      }
+      resultSuggestProduct = await addSuggestProduct(
+        muscle.children,
+        resultSuggestProduct
+      );
       // ? product for skinyfat person
       if (rsBfp === EResultIndexBody.FAT) {
-        return norPro;
+        return returnSuggestProduct(resultSuggestProduct);
       }
       // ? product for normal person
       else {
-        for (const e of health.children) {
-          const cate = await categoryRepo.findOne({
-            where: {
-              cateName: e.cateName,
-            },
-            relations: {
-              product: true,
-            },
-          });
-          if (!cate) return createHttpError.BadRequest("Category not found");
-          norPro = norPro.concat(cate.product);
-          if (norPro.length <= 0)
-            return createHttpError.BadRequest(
-              "Can't find suggest product list"
-            );
-        }
+        resultSuggestProduct = await addSuggestProduct(
+          health.children,
+          resultSuggestProduct
+        );
       }
-      return norPro;
+      return returnSuggestProduct(resultSuggestProduct);
     }
     // ? product for fat user
     else {
-      let fatPro: Product[] = [];
       const weightLose = dataMenu.find(
         (e) => e.cateName === ECateType.LOSEWEIGTH
       );
       if (!weightLose) return createHttpError.BadRequest("Category not found");
-      for (const e of weightLose.children) {
-        const cate = await categoryRepo.findOne({
-          where: {
-            cateName: e.cateName,
-          },
-          relations: {
-            product: true,
-          },
-        });
-        if (!cate) return createHttpError.BadRequest("Category not found");
-        fatPro = fatPro.concat(cate.product);
-        if (fatPro.length <= 0)
-          return createHttpError.BadRequest("Can't find suggest product list");
-      }
-      return fatPro;
+
+      resultSuggestProduct = await addSuggestProduct(
+        weightLose.children,
+        resultSuggestProduct
+      );
+      return returnSuggestProduct(resultSuggestProduct);
     }
   } catch (error) {
     return catchError(error, "Something went wrong when suggest product");
@@ -312,7 +344,7 @@ export const create = async (
 
       const productOptionRepository =
         AppDataSource.getRepository(ProductOption);
-      const { weigth, flavor, price } = options;
+      const { weight, flavor, price } = options;
 
       // price
       const priceRepo = AppDataSource.getRepository(Price);
@@ -354,9 +386,9 @@ export const create = async (
         })
       );
       const opt =
-        weigth && flavor
+        weight && flavor
           ? productOptionRepository.create({
-              weigth,
+              weight,
               flavor,
               product: newProduct,
               price: newPrice,
@@ -365,7 +397,7 @@ export const create = async (
             })
           : productOptionRepository.create({
               flavor: "none",
-              weigth: "1kg",
+              weight: "1kg",
               product: newProduct,
               price: newPrice,
               warehouse: newWarehouse,
@@ -406,7 +438,9 @@ export const getOneById = async (id: number) => {
           warehouse: true,
           image: true,
         },
-        feedbacks: true,
+        feedbacks: {
+          user: true,
+        },
         category: true,
       },
     });
@@ -422,6 +456,8 @@ export const getOneById = async (id: number) => {
           brand_description: product.brand.description,
           rate: product.rate,
           category: product.category,
+          productionDate: product.productionDate,
+          expirationDate: product.expirationDate,
           feedback: product.feedbacks.map((e) => {
             return {
               ...e,
@@ -433,11 +469,11 @@ export const getOneById = async (id: number) => {
             return { ...e };
           }),
           images: product.images.filter((e) => e.type === EnumTypeImage.desc),
-          product_options: product.productOptions.map((e) => {
+          productOptions: product.productOptions.map((e) => {
             return {
               product_option_id: e.id,
               flavor: e.flavor,
-              weigth: e.weigth,
+              weight: e.weight,
               price: e.price.price,
               quantity: e.warehouse.quantity,
               image: e.image,

@@ -18,9 +18,8 @@ export interface ResGetAllInboundNote {
       name: string;
       product_option_id: number;
       quantity: number;
-      ram: string;
-      rom: string;
-      color: string;
+      flavor: string;
+      weight: string;
     }[];
   }[];
 }
@@ -33,9 +32,8 @@ export interface ResGetOneInboundNote {
     name: string;
     product_option_id: number;
     quantity: number;
-    ram: string;
-    rom: string;
-    color: string;
+    flavor: string;
+    weight: string;
     image: string;
   }[];
 }

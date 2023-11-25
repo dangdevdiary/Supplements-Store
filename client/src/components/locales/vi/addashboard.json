@@ -1,6 +1,6 @@
 {
   "maindashboard": {
-    "admin": "Quản Trị",
+    "admin": "Quản Trị Viên",
     "home": "Trang Chủ",
     "products": "Sản Phẩm",
     "manage product": "Quản lý Sản Phẩm",
@@ -84,7 +84,7 @@
     "quantity": "SỐ LƯỢNG",
     "discount": "Giảm Giá",
     "total": "Tổng",
-    "cty": "CTY TNHH 3 THÀNH VIÊN FSTORE",
+    "cty": "CTY TNHH 3 THÀNH VIÊN Wheystore",
     "invoice": "HÓA ĐƠN MUA HÀNG",
     "infoorder": "Thông tin đơn hàng",
     "ordercode": "Mã đơn",
@@ -160,7 +160,7 @@
     "refuse": "Từ chối",
     "proininvoice": "Sản phẩm trong phiếu nhập",
     "No": "STT",
-    "configuration": "Cấu hình",
+    "configuration": "Vị - Trọng lượng",
     "search": "Tìm Kiếm",
     "totalinventory": "Tổng sản phẩm trong kho",
     "manageinvoiceinven": "Quản lý phiếu nhập kho",

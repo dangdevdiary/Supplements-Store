@@ -3,6 +3,7 @@ import * as orderServices from "../services/order.service";
 import * as analysServices from "../services/analysis.service";
 import { isError } from "../utils/error";
 import err from "../middlewares/error";
+import createHttpError from "http-errors";
 
 export const createOrder = async (
   req: Request,
@@ -16,6 +17,7 @@ export const createOrder = async (
       type: rs.type,
       product_option_id: rs.product_option_id,
     });
+  if (createHttpError.isHttpError(rs)) return next(rs);
   if (isError(rs)) return next(err(rs, res));
   return res.json(rs);
 };

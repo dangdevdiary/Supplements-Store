@@ -2,7 +2,7 @@ import { DeleteResult } from "typeorm";
 import { AppDataSource } from "../database";
 import { User } from "../entities/user.entity";
 import { EnumTypeImage, Image } from "../entities/image.entity";
-import { BadRequestError, ErrorInterface } from "../utils/error";
+import { BadRequestError, ErrorInterface, catchError } from "../utils/error";
 import bcryptjs from "bcryptjs";
 import { Address } from "../entities/address.entity";
 import { Ok, failed, success } from "../utils/response";
@@ -280,39 +280,48 @@ export const resetPwd = async (
 };
 
 export const addAvatar = async (uid: number, pathImg: string) => {
-  const imageRepo = AppDataSource.getRepository(Image);
-  const user = await userRepository.findOne({
-    where: {
-      id: uid,
-    },
-    relations: {
-      avatar: true,
-    },
-  });
-  if (!user) return BadRequestError("User not found");
+  try {
+    console.log(
+      "🚀 ~ file: user.service.ts:283 ~ addAvatar ~ pathImg:",
+      pathImg
+    );
 
-  if (user?.avatar?.id) {
-    try {
-      fs.unlinkSync("./public/" + user.avatar.imageUrl);
-      const rsUpdate = await imageRepo.update(
-        { imageUrl: user.avatar.imageUrl },
-        { imageUrl: pathImg }
-      );
-      return rsUpdate ? rsUpdate : BadRequestError("Fail");
-    } catch (error) {
-      return error;
+    const imageRepo = AppDataSource.getRepository(Image);
+    const user = await userRepository.findOne({
+      where: {
+        id: uid,
+      },
+      relations: {
+        avatar: true,
+      },
+    });
+    if (!user) return createHttpError.BadRequest("User not found");
+
+    if (user?.avatar?.id) {
+      try {
+        fs.unlinkSync("./public/" + user.avatar.imageUrl);
+        const rsUpdate = await imageRepo.update(
+          { imageUrl: user.avatar.imageUrl },
+          { imageUrl: pathImg }
+        );
+        return rsUpdate ? rsUpdate : createHttpError.BadRequest("Fail");
+      } catch (error) {
+        return catchError(error, "Something went wrong went delete old avatar");
+      }
     }
-  }
 
-  if (!pathImg.length) return BadRequestError("image empty");
-  const rs = await imageRepo.save(
-    imageRepo.create({
-      type: EnumTypeImage.avatar,
-      imageUrl: pathImg,
-      user,
-    })
-  );
-  return rs ? rs : BadRequestError("Fail");
+    if (!pathImg.length) return BadRequestError("image empty");
+    const rs = await imageRepo.save(
+      imageRepo.create({
+        type: EnumTypeImage.avatar,
+        imageUrl: pathImg,
+        user,
+      })
+    );
+    return rs ? rs : createHttpError.BadRequest("Fail");
+  } catch (error) {
+    return catchError(error, "Something went wrong when update avatar");
+  }
 };
 export const getOne = async (
   id: number

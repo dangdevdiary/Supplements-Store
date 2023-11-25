@@ -59,5 +59,12 @@ const userApi = {
   resetPassword(data: Omit<TForgotPassword, 'confirmNewPassword' | 'otp'> & { otp: string }) {
     return http.post<{ message: string }>('user/reset-password', data);
   },
+  updateAvatar(avatar: FormData, uid: number) {
+    return http.post(`user/avatar/add/${uid}`, avatar, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
 };
 export default userApi;

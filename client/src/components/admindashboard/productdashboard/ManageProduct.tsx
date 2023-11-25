@@ -137,6 +137,9 @@ export default function ManageProduct() {
                             <th scope='col' className='px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 '>
                               {t('product.brand')}
                             </th>
+                            <th scope='col' className='px-6 py-3 text-left text-xs font-bold uppercase text-gray-500 '>
+                              Danh mục
+                            </th>
                             <th scope='col' className='px-6 py-3 text-right text-xs font-bold uppercase text-gray-500 '>
                               <p className='mr-4'>{t('product.actions')}</p>
                             </th>
@@ -151,6 +154,7 @@ export default function ManageProduct() {
                                 </td>
                                 <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.name}</td>
                                 <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.brand}</td>
+                                <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.category}</td>
                                 <td className='whitespace-nowrap px-6 py-4 text-right text-sm font-medium'>
                                   <button className='px-1 text-blue-500 hover:text-blue-700'>
                                     <AiOutlineFileSearch

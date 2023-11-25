@@ -75,7 +75,7 @@ AppDataSource.initialize()
           });
         } else {
           return res.status(500).json({
-            message: err.message,
+            message: err.message || err,
             status: 500,
           });
         }

@@ -6,16 +6,13 @@ const categoryRepository = AppDataSource.getRepository(Category);
 
 export const getAllCategory = async () => {
   try {
-    const [rs, total] = await categoryRepository.findAndCount({
+    const rs = await categoryRepository.find({
       relations: {
         children: true,
         parent: true,
       },
     });
-    return {
-      count: total,
-      data: rs,
-    };
+    return rs;
   } catch (error) {
     return catchError(error, "Something went wrong when get all category");
   }
@@ -72,8 +69,10 @@ export const addSubCategory = async (
   cateDescription: string
 ) => {
   try {
-    if (!parentCateId || !cateName || !cateDescription)
+    if (!cateName || !cateDescription)
       return createHttpError.BadRequest("Miss infomation! please fill all");
+    const existCate = await categoryRepository.findOneBy({ cateName });
+    if (existCate) return createHttpError.BadRequest("category name is exits");
     const parentCate = await categoryRepository.findOne({
       where: {
         cateId: parentCateId,
@@ -83,11 +82,8 @@ export const addSubCategory = async (
         parent: true,
       },
     });
-    if (!parentCate)
-      return createHttpError.BadRequest("Not found parent category");
+    if (!parentCate) return await createCategory(cateName, cateDescription);
 
-    const existCate = await categoryRepository.findOneBy({ cateName });
-    if (existCate) return createHttpError.BadRequest("category name is exits");
     const newCate = await categoryRepository.save(
       categoryRepository.create({
         cateName,
@@ -106,11 +102,19 @@ export const addSubCategory = async (
 
 export const updateCategory = async (
   cateId: number,
+  parentCateId: number,
   cateName: string,
   cateDescription: string
 ) => {
   try {
     const cate = await categoryRepository.findOneBy({ cateId });
+    const parentCate = await categoryRepository.findOneBy({
+      cateId: parentCateId,
+    });
+    if (!parentCate)
+      return createHttpError.BadRequest(
+        "parent category not found with this id"
+      );
     if (!cate)
       return createHttpError.BadRequest("category not found with this id");
     return categoryRepository.update(
@@ -118,6 +122,7 @@ export const updateCategory = async (
       {
         cateDescription,
         cateName,
+        parent: parentCate,
       }
     );
   } catch (error) {

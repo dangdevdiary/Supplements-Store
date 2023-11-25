@@ -24,7 +24,7 @@ function Password() {
         }>(err)
       ) {
         if (err.response?.data.message === 'old password is not correct') {
-          toast.error(t('pasword.old password is incorrect'), { autoClose: 2000 });
+          toast.error('old password is not correct', { autoClose: 2000 });
         }
       }
     },

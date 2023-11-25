@@ -159,8 +159,8 @@ function CartUser() {
             });
           },
           onError: (err) => {
-            if (isAxiosErr<{ error: string }>(err)) {
-              toast.error(err.response?.data.error, { autoClose: 2000 });
+            if (isAxiosErr<{ message: string }>(err)) {
+              toast.error(err.response?.data.message, { autoClose: 2000 });
             }
           },
         });
@@ -171,7 +171,7 @@ function CartUser() {
     <div className='mx-auto max-w-7xl bg-transparent p-4'>
       <HelmetSEO title='Giỏ hàng'></HelmetSEO>
       <div className='mb-2'>
-        <BreadCrumb path={['Fstore', t('cartUser:cartUser.cart')]} />
+        <BreadCrumb path={['Wheystore', t('cartUser:cartUser.cart')]} />
       </div>
       {/* top section cart*/}
       <div className='grid grid-cols-12 gap-2 bg-white px-6 py-4 text-lg font-semibold shadow-sm'>

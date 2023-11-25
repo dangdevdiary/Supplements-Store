@@ -165,7 +165,7 @@ export const getInboundNote = async (id: number) => {
             product_option_id: e.id,
             quantity: e.quantity,
             flavor: e.product_option.flavor,
-            weihth: e.product_option.weigth,
+            weight: e.product_option.weight,
 
             image: e.product_option.image.imageUrl,
           };
@@ -258,7 +258,7 @@ export const getAllInboundNote = async (limit: number, page: number) => {
                 product_option_id: el.id,
                 quantity: el.quantity,
                 flavor: el.product_option.flavor,
-                weihth: el.product_option.weigth,
+                weihth: el.product_option.weight,
               };
             }),
           };

@@ -8,6 +8,9 @@ const feedbackApi = {
   getFeedback(productId: number) {
     return http.get<ResGetFeedback>(`/feedback/get_by_product/${productId}`);
   },
+  deleteFeedback(productId: number) {
+    return http.delete(`/feedback/${productId}`);
+  },
   updateFeedback(
     productId: number,
     feedback: {

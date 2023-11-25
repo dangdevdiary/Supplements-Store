@@ -157,7 +157,7 @@ export default function DetailOrder() {
                               {e.product_option_id}
                             </td>
                             <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{e.product_name}</td>
-                            <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{`${e.ram}/${e.rom} - ${e.color}`}</td>
+                            <td className='whitespace-nowrap px-6 py-4 text-sm text-gray-800'>{`${e.flavor} - ${e.weight}`}</td>
                             <td className='text-md whitespace-nowrap px-6 py-4 text-gray-800'>
                               {formatPrice(e.prices)}
                             </td>

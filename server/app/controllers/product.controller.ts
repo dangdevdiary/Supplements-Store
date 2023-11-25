@@ -62,7 +62,7 @@ export const create = async (
       name,
       description,
       flavor,
-      weigth,
+      weight,
       price,
       brandId,
       cateId,
@@ -75,7 +75,7 @@ export const create = async (
     const { path } = file;
     const rs = await productServices.create(
       { name, description, productionDate, expirationDate },
-      { flavor, weigth, price },
+      { flavor, weight, price },
       path.replace(`public\\`, ""),
       brandId,
       cateId
@@ -103,22 +103,41 @@ export const suggestProduct = async (
       );
     const bmi = bmiC(weight, height).toFixed(1);
     if (gender === EGender.FEMALE) {
-      bfp = Number(bfpFemale(height, waist, neck, hip).toFixed(1));
+      bfp = Number(
+        bfpFemale(
+          Number(height),
+          Number(waist),
+          Number(neck),
+          Number(hip)
+        ).toFixed(1)
+      );
       const suggest = await productServices.suggestProduct(
         Number(bmi),
         bfp,
         EGender.FEMALE
       );
-      return res.status(200).json(suggest);
+      return createHttpError.isHttpError(suggest)
+        ? next(suggest)
+        : res.status(200).json({
+            status: "success",
+            data: suggest,
+          });
     }
     if (gender === EGender.MALE) {
-      bfp = Number(bfpMale(height, waist, neck).toFixed(1));
+      bfp = Number(
+        bfpMale(Number(height), Number(waist), Number(neck)).toFixed(1)
+      );
       const suggest = await productServices.suggestProduct(
         Number(bmi),
         bfp,
         EGender.MALE
       );
-      return res.status(200).json(suggest);
+      return createHttpError.isHttpError(suggest)
+        ? next(suggest)
+        : res.status(200).json({
+            status: "success",
+            data: suggest,
+          });
     }
   } catch (error) {
     next(error);

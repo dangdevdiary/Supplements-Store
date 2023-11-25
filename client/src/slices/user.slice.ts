@@ -9,7 +9,6 @@ interface UserState {
 
 function init() {
   const token = getAccessToken();
-  console.log('🚀 ~ file: user.slice.ts:12 ~ init ~ token:', token);
   if (token) {
     const user = jwtDecode<{
       firstName: string;

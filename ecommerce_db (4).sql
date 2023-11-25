@@ -364,10 +364,10 @@ INSERT INTO `products` (`id`, `name`, `description`, `createAt`, `updateAt`, `br
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `product_options`
+-- Cấu trúc bảng cho bảng `productOptions`
 --
 
-CREATE TABLE `product_options` (
+CREATE TABLE `productOptions` (
   `id` int(11) NOT NULL,
   `color` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `ram` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -379,10 +379,10 @@ CREATE TABLE `product_options` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `product_options`
+-- Đang đổ dữ liệu cho bảng `productOptions`
 --
 
-INSERT INTO `product_options` (`id`, `color`, `ram`, `rom`, `product_id`, `price_id`, `warehouse_id`, `image`) VALUES
+INSERT INTO `productOptions` (`id`, `color`, `ram`, `rom`, `product_id`, `price_id`, `warehouse_id`, `image`) VALUES
 (1, 'black', '8GB', '128GB', 1, 1, 34, '9a056bda-4825-4861-8995-5341a3d02bf0'),
 (3, 'white', '6GB', '128GB', 1, 3, 36, '1eb27915-23b0-456d-8414-a34b54e3c9db'),
 (4, 'black', '8GB', '128GB', 2, 4, 37, '0ef32115-2d84-4f94-96c6-1bd6ed2e9b14'),
@@ -741,9 +741,9 @@ ALTER TABLE `products`
   ADD KEY `FK_1530a6f15d3c79d1b70be98f2be` (`brand_id`);
 
 --
--- Chỉ mục cho bảng `product_options`
+-- Chỉ mục cho bảng `productOptions`
 --
-ALTER TABLE `product_options`
+ALTER TABLE `productOptions`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `REL_c41c82a6f891d5503f874db763` (`price_id`),
   ADD UNIQUE KEY `REL_50151a045e720c18bd8fdd122b` (`warehouse_id`),
@@ -881,9 +881,9 @@ ALTER TABLE `products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT cho bảng `product_options`
+-- AUTO_INCREMENT cho bảng `productOptions`
 --
-ALTER TABLE `product_options`
+ALTER TABLE `productOptions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
@@ -950,7 +950,7 @@ ALTER TABLE `images`
 -- Các ràng buộc cho bảng `inventory_transactions`
 --
 ALTER TABLE `inventory_transactions`
-  ADD CONSTRAINT `FK_9ac4f4f0347d4d1e717bbb20300` FOREIGN KEY (`product_option_id`) REFERENCES `product_options` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_9ac4f4f0347d4d1e717bbb20300` FOREIGN KEY (`product_option_id`) REFERENCES `productOptions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Các ràng buộc cho bảng `notifications`
@@ -971,7 +971,7 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `order_items`
   ADD CONSTRAINT `FK_145532db85752b29c57d2b7b1f1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_5dd538d6ee529025a2d8fac5146` FOREIGN KEY (`product_option_id`) REFERENCES `product_options` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_5dd538d6ee529025a2d8fac5146` FOREIGN KEY (`product_option_id`) REFERENCES `productOptions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `FK_7f4a469f9a72cbb311626e3c444` FOREIGN KEY (`inventory_inbound_note_id`) REFERENCES `inventory_inbound_notes` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
@@ -987,9 +987,9 @@ ALTER TABLE `products`
   ADD CONSTRAINT `FK_1530a6f15d3c79d1b70be98f2be` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
--- Các ràng buộc cho bảng `product_options`
+-- Các ràng buộc cho bảng `productOptions`
 --
-ALTER TABLE `product_options`
+ALTER TABLE `productOptions`
   ADD CONSTRAINT `FK_49677f87ad61a8b2a31f33c8a2c` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `FK_50151a045e720c18bd8fdd122bd` FOREIGN KEY (`warehouse_id`) REFERENCES `warehouse` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `FK_c41c82a6f891d5503f874db7636` FOREIGN KEY (`price_id`) REFERENCES `prices` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,

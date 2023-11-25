@@ -43,7 +43,7 @@ export interface ResGetAllOrder {
       product_name: string;
       product_option_id: number;
       flavor: string;
-      weigth: string;
+      weight: string;
       quantity: number;
       prices: number;
       image: string;
@@ -73,8 +73,8 @@ export interface ResGetOneOrder {
   order_items: {
     product_name: string;
     product_option_id: number;
-    ram: string;
-    rom: string;
+    flavor: string;
+    weight: string;
     color: string;
     quantity: number;
     image: string;

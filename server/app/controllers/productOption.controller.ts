@@ -11,7 +11,7 @@ export const create = async (
   next: NextFunction
 ) => {
   try {
-    const { flavor, weigth, price } = req.body;
+    const { flavor, weight, price } = req.body;
     const { productId } = req.params;
     const file = req.file;
 
@@ -22,7 +22,7 @@ export const create = async (
       Number(productId),
       {
         flavor,
-        weigth,
+        weight,
         price,
       },
       path.replace(`public\\`, ``)
@@ -49,12 +49,12 @@ export const updateOne = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { flavor, weigth, price } = req.body;
-  if (!flavor && !weigth && !price)
+  const { flavor, weight, price } = req.body;
+  if (!flavor && !weight && !price)
     return next(err(BadRequestError("data empty"), res));
   const rs = await productOptionServices.updateOne(Number(req.params.id), {
     flavor,
-    weigth,
+    weight,
     price,
   });
   return isError(rs) ? next(err(rs, res)) : res.json(rs);

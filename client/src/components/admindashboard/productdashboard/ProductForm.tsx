@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import HelmetSale from 'src/components/Helmet';
 import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
 import { useTranslation } from 'react-i18next';
+import categoryApi from 'src/apis/category.api';
 
 export default function ProductForm() {
   const navigate = useNavigate();
@@ -17,19 +18,37 @@ export default function ProductForm() {
     retry: 1,
     refetchOnWindowFocus: false,
   });
-  const [name, setName] = useState('');
-  const [brandId, setBrandId] = useState(-1);
-  const [image, setImage] = useState<File>();
-  const [description, setDesc] = useState('');
-  const [ram, setRam] = useState('');
-  const [rom, setRom] = useState('');
-  const [color, setColor] = useState('');
-  const [price, setPrice] = useState('');
+  const { data: cates } = useQuery(['getAllCate'], () => categoryApi.getAllCategory());
+
   const [specs, setSpecs] = useState<{ key: string; value: string; id: number }[]>([]);
   const [specModal, openSpecModal] = useState(false);
   const [keySpec, setKeySpec] = useState('');
   const [specId, setIdSpec] = useState(-1);
   const [valueSpec, setValueSpec] = useState('');
+
+  const [productData, setProductData] = useState<{
+    name: string;
+    brandId: number;
+    image?: File;
+    description: string;
+    flavor: string;
+    weight: string;
+    price: string;
+    cateId: number;
+    productionDate: string;
+    expirationDate: string;
+  }>({
+    name: '',
+    brandId: -1,
+    image: undefined,
+    description: '',
+    flavor: '',
+    weight: '',
+    price: '',
+    cateId: -1,
+    productionDate: '',
+    expirationDate: '',
+  });
   const [specModalType, setSpecModalType] = useState('create');
   const [refetch, _refetch] = useState(0);
 
@@ -39,43 +58,52 @@ export default function ProductForm() {
         .getProductDetail(location.state.id)
         .then((res) => res.data)
         .then((data) => {
-          setName(data.name);
-          setBrandId(data.brandId !== undefined ? data.brandId : -1);
-          setDesc(data.description);
+          setProductData({
+            ...productData,
+            name: data.name,
+            brandId: data.brandId !== undefined ? data.brandId : -1,
+            description: data.description,
+          });
           setSpecs(data.specs);
         });
     }
   }, [refetch]);
 
   const createProduct = async () => {
-    if (!image) {
+    if (!productData.image) {
       toast.error('please select image for product');
       return;
     }
     const data = new FormData();
-    data.append('name', name);
-    data.append('brandId', `${brandId}`);
-    data.append('description', description);
-    data.append('ram', ram);
-    data.append('rom', rom);
-    data.append('color', color);
-    data.append('price', price);
-    data.append('image', image);
-    const response = await productsApi.createProduct(data);
-
-    if (response.status === 200) toast.success('create new product success!');
-    else toast.error(`an error occured when create product: ${response.statusText}`);
+    data.append('name', productData.name);
+    data.append('brandId', `${productData.brandId}`);
+    data.append('cateId', `${productData.cateId}`);
+    data.append('description', productData.description);
+    data.append('flavor', productData.flavor);
+    data.append('weight', productData.weight);
+    data.append('expirationDate', productData.expirationDate);
+    data.append('productionDate', productData.productionDate);
+    data.append('price', productData.price);
+    data.append('image', productData.image);
+    await productsApi
+      .createProduct(data)
+      .then(() => {
+        toast.success('Tạo sản phẩm thành công!');
+      })
+      .catch(() => {
+        toast.error(`Lỗi không thể tạo sản phẩm`);
+      });
   };
 
   const updateProduct = async () => {
     const response = await productsApi.updateProduct(Number(location.state.id), {
-      name,
-      description,
-      brandId,
+      name: productData.name,
+      description: productData.description,
+      brandId: productData.brandId,
     });
 
-    if (response.status === 200) toast.success('update product success!');
-    else toast.error(`an error occured when update product: ${response.statusText}`);
+    if (response.status === 200) toast.success('Cập nhật sản phẩm thành công');
+    else toast.error(`Cập nhật sản phẩm thất bại: ${response.statusText}`);
   };
   const { t } = useTranslation('addashboard');
 
@@ -95,24 +123,26 @@ export default function ProductForm() {
                 </h1>
                 <div className='grid grid-cols-2 gap-4 pt-4'>
                   <div>
-                    <p className='text-md pb-1 indent-2 leading-normal'>{t('product.name')}</p>
+                    <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>{t('product.name')}</p>
                     <input
                       type='text'
                       className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
                       placeholder={t('product.name')}
-                      defaultValue={name}
-                      onChange={(e) => setName(e.target.value)}
+                      defaultValue={productData.name}
+                      onChange={(e) => setProductData({ ...productData, name: e.target.value })}
                     />
                   </div>
                   <div>
-                    <p className='text-md pb-1 indent-2 leading-normal'>{t('detailproduct.selectbrand')}</p>
+                    <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>
+                      {t('detailproduct.selectbrand')}
+                    </p>
                     <select
                       className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
-                      onChange={(e) => setBrandId(Number(e.target.value))}
+                      onChange={(e) => setProductData({ ...productData, brandId: Number(e.target.value) })}
                     >
-                      <option>{t('detailproduct.selectbrand')}</option>
+                      <option>Thương hiệu</option>
                       {brand.data?.data.map((e: { id: number; name: string }, i) => (
-                        <option key={i.toString()} value={e.id} selected={brandId === e.id}>
+                        <option key={i.toString()} value={e.id} selected={productData.brandId === e.id}>
                           {e.name}
                         </option>
                       ))}
@@ -120,70 +150,96 @@ export default function ProductForm() {
                   </div>
                 </div>
                 {location.state.type === 'create' && (
-                  <div className='pt-4'>
-                    <p className='text-md pb-1 indent-2 leading-normal'>{t('detailproduct.image')}</p>
-                    <input
-                      className='bg-gray-150 w-full cursor-pointer rounded-lg border border-gray-300 text-sm font-medium leading-loose text-gray-900 focus:outline-none'
-                      type='file'
-                      onChange={(e) => {
-                        const image = e.target.files;
-                        if (image?.length) {
-                          setImage(image[0]);
-                        }
-                      }}
-                    />
-                    <p className='mt-1 text-sm text-gray-500'>JPEG, PNG or JPG (MAX. 800x400px).</p>
+                  <div className='mt-4 grid grid-cols-2 gap-4'>
+                    <div>
+                      <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>{t('detailproduct.image')}</p>
+                      <input
+                        className='bg-gray-150 w-full cursor-pointer rounded-lg border border-gray-300 text-sm font-medium leading-loose text-gray-900 focus:outline-none'
+                        type='file'
+                        onChange={(e) => {
+                          const image = e.target.files;
+                          if (image?.length) {
+                            setProductData({ ...productData, image: image[0] });
+                          }
+                        }}
+                      />
+                      <p className='mt-1 text-sm text-gray-500'>JPEG, PNG or JPG (MAX. 800x400px).</p>
+                    </div>
+                    <div>
+                      <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>Lựa chọn danh mục</p>
+                      <select
+                        className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
+                        onChange={(e) => {
+                          setProductData({ ...productData, cateId: Number(e.target.value) });
+                        }}
+                      >
+                        <option>Danh mục</option>
+                        {cates?.data?.data.map((e, i) => (
+                          <option key={i.toString()} value={e.cateId} selected={productData.cateId === e.cateId}>
+                            {e.cateName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 )}
                 <div className='pt-4'>
-                  <p className='text-md pb-1 indent-2 leading-normal'>{t('product.description')}</p>
+                  <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>{t('product.description')}</p>
                   <textarea
                     placeholder={t('product.description')}
                     rows={4}
+                    spellCheck={false}
                     className='block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500'
-                    onChange={(e) => setDesc(e.target.value)}
-                    defaultValue={description}
+                    onChange={(e) => setProductData({ ...productData, description: e.target.value })}
+                    defaultValue={productData.description}
                   ></textarea>
                 </div>
                 {location.state.type === 'create' && (
                   <>
                     <div className='grid grid-cols-2 gap-4 pt-4'>
                       <div>
-                        <p className='text-md pb-1 indent-2 leading-normal'>RAM</p>
+                        <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>VỊ</p>
                         <input
                           type='text'
                           className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
-                          placeholder='8GB'
-                          onChange={(e) => setRam(e.target.value)}
+                          placeholder='VANI'
+                          onChange={(e) => setProductData({ ...productData, flavor: e.target.value })}
                         />
                       </div>
                       <div>
-                        <p className='text-md pb-1 indent-2 leading-normal'>ROM</p>
+                        <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>TRỌNG LƯỢNG</p>
                         <input
                           type='text'
                           className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
-                          placeholder='256GB'
-                          onChange={(e) => setRom(e.target.value)}
+                          placeholder='1KG'
+                          onChange={(e) => setProductData({ ...productData, weight: e.target.value })}
                         />
                       </div>
                     </div>
                     <div className='grid grid-cols-2 gap-4 pt-2'>
                       <div>
-                        <p className='text-md pb-1 indent-2 leading-normal'>{t('detailproduct.color')}</p>
+                        <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>Ngày sản xuất</p>
                         <input
-                          type='text'
+                          type='date'
                           className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
-                          placeholder='BLACK'
-                          onChange={(e) => setColor(e.target.value)}
+                          onChange={(e) => setProductData({ ...productData, productionDate: e.target.value })}
                         />
                       </div>
                       <div>
-                        <p className='text-md pb-1 indent-2 leading-normal'>{t('detailproduct.price')}</p>
+                        <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>Ngày hết hạn</p>
+                        <input
+                          type='date'
+                          className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
+                          onChange={(e) => setProductData({ ...productData, expirationDate: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <p className='text-md pb-1 indent-2 leading-normal text-gray-500'>{t('detailproduct.price')}</p>
                         <input
                           type='text'
                           className='bg-gray-150 w-full rounded-md border border-gray-300 py-2 px-4'
                           placeholder='100000'
-                          onChange={(e) => setPrice(e.target.value)}
+                          onChange={(e) => setProductData({ ...productData, price: e.target.value })}
                         />
                       </div>
                     </div>
